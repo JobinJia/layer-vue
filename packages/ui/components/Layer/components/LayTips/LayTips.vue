@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { type CSSProperties } from 'vue'
 import { useZIndex } from '../../../../composables/zIndex'
-import { computed, CSSProperties, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { layerProps } from '../../props'
 import { useOffset } from '../../../../composables/offset'
 import { useAutoClose } from '../../../../composables/autoClose'
 
 const props = defineProps(layerProps)
+
 const emit = defineEmits<{
   (event: 'close', visible: boolean): void
 }>()
@@ -30,13 +32,8 @@ useAutoClose(props, emit)
     :style="basicStyle"
     ref="layerModalRefEl"
     class="layui-layer layui-layer-dialog layui-layer-border layui-layer-msg layui-layer-hui"
-    id="layui-layer100098"
-    type="dialog"
-    times="100098"
-    showtime="3000"
-    contype="string"
   >
-    <div id="" class="layui-layer-content">一段提示信息</div>
+    <div id="" class="layui-layer-content">一段提示信息{{ props.time }}</div>
     <span class="layui-layer-setwin"></span>
   </div>
 </template>

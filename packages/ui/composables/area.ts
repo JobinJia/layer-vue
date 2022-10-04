@@ -1,4 +1,4 @@
-import { LayerProps } from '../components/Layer/props'
+import { type LayerProps } from '../components/Layer/props'
 import { toRefs, unref } from 'vue'
 import { isNumber } from 'lodash'
 

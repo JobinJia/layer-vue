@@ -3,29 +3,33 @@
 // import HelloWorld from './components/HelloWorld.vue'
 import { ref } from 'vue'
 const visible = ref(false)
+const message = ref(false)
 const tooltip = ref(false)
+const tooltipAutoClose= ref(false)
 </script>
 
 <template>
   <header>
-    <TButton @click="visible = !visible">Click</TButton>
+    <TButton @click="visible = !visible">Modal</TButton>
+    <TButton @click="message = !message">Message</TButton>
     <br/>
     <br/>
     <br/>
     <VLayer v-model:visible="visible"></VLayer>
+    <VLayer v-model:visible="message" type="message"></VLayer>
     <div style="display: flex;flex-direction: row; justify-content: space-between">
-      <VLayerToolTip v-model:visible="tooltip" content="RRRR">
+      <VLayer v-model:visible="tooltipAutoClose" type="tips" content="RRRR" :time="3000">
         <TButton>Default(R)</TButton>
-      </VLayerToolTip>
-      <VLayerToolTip v-model:visible="tooltip" tips="t" content="TTTTT">
+      </VLayer>
+      <VLayer v-model:visible="tooltip" tips="t" type="tips" content="TTTTT">
         <TButton>Default(T)</TButton>
-      </VLayerToolTip>
-      <VLayerToolTip v-model:visible="tooltip" tips="l" content="LLLL">
+      </VLayer>
+      <VLayer v-model:visible="tooltip" tips="l" type="tips" content="LLLL">
         <TButton>Default(L)</TButton>
-      </VLayerToolTip>
-      <VLayerToolTip v-model:visible="tooltip" tips="b" content="BBBB">
+      </VLayer>
+      <VLayer v-model:visible="tooltip" tips="b" type="tips" content="BBBB">
         <TButton>Default(B)</TButton>
-      </VLayerToolTip>
+      </VLayer>
     </div>
     <!--    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />-->
 

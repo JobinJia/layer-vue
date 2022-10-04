@@ -1,39 +1,44 @@
 <script setup lang="ts">
-import LayModal from './components/LayModal/LayModal.vue'
-import LayShade from './components/LayShade.vue'
-import LayTips from './components/LayTips/LayTips.vue'
-import LayToolTip from './components/LayToolTip/LayToolTip.vue'
+import {type Component } from 'vue'
+import { watch, useSlots } from 'vue'
+import VLayerWrapper from './VLayerWrapper.vue'
+import VLayerTips from './components/LayToolTip/LayToolTip.vue'
 import { layerProps } from './props'
-import { computed, toRefs, unref, useSlots } from 'vue'
-import { useLayerTransition } from '../../composables/transition'
-import { useComponentProps } from '../../composables/componentProps'
-
+import { computed, shallowRef, toRefs, unref, useAttrs, watchEffect } from 'vue'
 const props = defineProps(layerProps)
-
-const emit = defineEmits<{
-  (event: 'update:visible', visible: boolean): void
-}>()
-
-const { visible, type } = toRefs(props)
-
-// 是否展示 Shade层
-const showShade = computed(() => {
-  return unref(visible) && unref(type) === 0
-})
-// transition
-const { layerTransition } = useLayerTransition(props)
-// dynamic props
-const { dynamicProps } = useComponentProps(props)
-
+const attrs = useAttrs()
 const slots = useSlots()
+
+const { type } = toRefs(props)
+
+const comp = shallowRef<Component>(VLayerWrapper)
+
+watch(
+  type,
+  (typeVal) => {
+    switch (typeVal) {
+      case 'tips':
+        comp.value = VLayerTips
+        break
+      default:
+        break
+    }
+  },
+  { immediate: true }
+)
+
+const bindProps = computed(() => {
+  return {
+    ...props,
+    ...attrs
+  }
+})
 </script>
 
 <template>
-  <teleport to="body">
-    <LayShade v-if="showShade" :shade="props.shade" :shade-close="props.shadeClose"></LayShade>
-    <transition :enter-active-class="layerTransition.in" :leave-active-class="layerTransition.out">
-      <LayModal v-if="visible" v-bind="dynamicProps" @close="(v) => $emit('update:visible', v)"></LayModal>
-      <!--      <LayTips v-if="visible" v-bind="dynamicProps" @close="(v) => $emit('update:visible', v)"></LayTips>-->
-    </transition>
-  </teleport>
+  <component :is="comp" v-bind="bindProps">
+    <template v-for="name in Object.keys(slots)" :key="name" #[name]>
+      <slot :name="name"></slot>
+    </template>
+  </component>
 </template>

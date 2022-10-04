@@ -1,5 +1,6 @@
-import { LayerProps } from '../components/Layer/props'
-import { nextTick, onMounted, Ref, ref, toRefs, unref } from 'vue'
+import { type LayerProps } from '../components/Layer/props'
+import { type Ref } from 'vue'
+import { onMounted, ref, toRefs, unref } from 'vue'
 import { isNumber } from 'lodash'
 import { getDomWidthAndHeight } from '../utils/dom'
 import { windowViewWidth, windowViewHeight } from '../utils/window'
@@ -16,8 +17,8 @@ export function useOffset(props: LayerProps, el: Ref<HTMLElement | null>) {
     let offsetTop = (windowViewHeight - domHeight) / 2
     let offsetLeft = (windowViewWidth - domWidth) / 2
     const offsetVal = unref(offset)
-    if (isNumber(offset)) {
-      offsetTop = offset
+    if (isNumber(offsetVal)) {
+      offsetTop = offsetVal
     } else if (Array.isArray(offsetVal)) {
       const [t, l] = offsetVal
       offsetTop = t

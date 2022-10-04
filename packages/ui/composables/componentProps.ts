@@ -1,5 +1,5 @@
-import { LayerProps } from '../components/Layer/props'
-import { ref, toRefs, watch } from 'vue'
+import { type LayerProps } from '../components/Layer/props'
+import {ref, toRefs, watch, watchEffect} from 'vue'
 
 export function useComponentProps(props: LayerProps) {
   const { type } = toRefs(props)
@@ -8,10 +8,9 @@ export function useComponentProps(props: LayerProps) {
   function generateProps(type: LayerProps['type']) {
     let cacheProps: Partial<LayerProps> = {}
     switch (type) {
-      // tips
-      case 4:
+      // 原来是tips, 现在为message
+      case 'message':
         cacheProps = {
-          type: 4,
           // closeBtn: false,
           time: 3000,
           shade: false,
@@ -29,13 +28,9 @@ export function useComponentProps(props: LayerProps) {
     }
   }
 
-  watch(
-    type,
-    (typeVal) => {
-      generateProps(typeVal)
-    },
-    { immediate: true }
-  )
+  watchEffect(() => {
+    generateProps(props.type)
+  })
 
   return {
     dynamicProps

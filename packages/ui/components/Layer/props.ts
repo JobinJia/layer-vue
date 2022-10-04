@@ -1,8 +1,11 @@
-import { ExtractPropTypes, PropType } from 'vue'
+import { type ExtractPropTypes, PropType } from 'vue'
 
 // type中移除page 如果要使用 可以 在default slot中 div v-html="xxx
 // 原来的1 = page 现更正为message
-export type LayerType = 0 | 1 | 2 | 3 | 4 // | 'dialog(modal)' | 'message' | 'iframe' | 'loading' | 'tips';
+// export type LayerType = 0 | 1 | 2 | 3 | 4 // | 'dialog(modal)' | 'message' | 'iframe' | 'loading' | 'tips';
+export type LayerType = 'dialog' | 'page' | 'iframe' | 'loading' | 'tips' | 'message'
+export type LayerTransitionType = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
 export type Area = number | [number, number] | 'auto'
 export type Offset =
   | number
@@ -35,10 +38,11 @@ export const layerProps = {
    * layer提供了5种层类型。
    * 可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）。
    * 若你采用layer.open({type: 1})方式调用，则type为必填项（信息框除外）
+   * 'dialog' | 'page' | 'iframe' | 'loading' | 'tips' | 'message'
    */
   type: {
-    type: Number as PropType<LayerType>,
-    default: 0
+    type: String as PropType<LayerType>,
+    default: 'dialog'
   },
   /**
    * 标题
@@ -243,7 +247,7 @@ export const layerProps = {
   },
   closeBtn: {
     type: [Number, Boolean] as PropType<BtnType>,
-    default: false,
+    default: false
   },
   /**
    * tooltips

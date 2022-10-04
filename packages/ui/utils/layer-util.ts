@@ -1,4 +1,4 @@
-import { Offset } from '../components/Layer/props'
+import { type Offset } from '../components/Layer/props'
 
 export function getDrawerAnimationClass(offset: Offset, isClose: boolean = false) {
   const prefix = 'layer-drawer-anim layer-anim'

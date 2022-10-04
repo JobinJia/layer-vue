@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { type CSSProperties } from 'vue'
 import { useZIndex } from '../../../../composables/zIndex'
-import { computed, CSSProperties, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { layerProps } from '../../props'
 import { useOffset } from '../../../../composables/offset'
 import { useAutoClose } from '../../../../composables/autoClose'

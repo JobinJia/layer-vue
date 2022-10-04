@@ -1,5 +1,6 @@
 import { type LayerProps } from '../components/Layer/props'
-import {CSSProperties, nextTick, onMounted, Ref, ref, toRefs, unref, watch} from 'vue'
+import { type Ref, type CSSProperties } from 'vue'
+import { nextTick, onMounted, ref, toRefs, unref, watch } from 'vue'
 import { isObject, isString } from 'lodash'
 import { getDomWidthAndHeight } from '../utils/dom'
 import { getWindowScroll, windowViewHeight, windowViewWidth } from '../utils/window'
