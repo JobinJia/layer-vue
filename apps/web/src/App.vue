@@ -3,16 +3,30 @@
 // import HelloWorld from './components/HelloWorld.vue'
 import { ref } from 'vue'
 const visible = ref(false)
-const tooltip = ref(true)
+const tooltip = ref(false)
 </script>
 
 <template>
   <header>
     <TButton @click="visible = !visible">Click</TButton>
+    <br/>
+    <br/>
+    <br/>
     <VLayer v-model:visible="visible"></VLayer>
-    <VLayerToolTip v-model:visible="tooltip">
-      Content Dom
-    </VLayerToolTip>
+    <div style="display: flex;flex-direction: row; justify-content: space-between">
+      <VLayerToolTip v-model:visible="tooltip" content="RRRR">
+        <TButton>Default(R)</TButton>
+      </VLayerToolTip>
+      <VLayerToolTip v-model:visible="tooltip" tips="t" content="TTTTT">
+        <TButton>Default(T)</TButton>
+      </VLayerToolTip>
+      <VLayerToolTip v-model:visible="tooltip" tips="l" content="LLLL">
+        <TButton>Default(L)</TButton>
+      </VLayerToolTip>
+      <VLayerToolTip v-model:visible="tooltip" tips="b" content="BBBB">
+        <TButton>Default(B)</TButton>
+      </VLayerToolTip>
+    </div>
     <!--    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />-->
 
     <!--    <div class="wrapper">-->

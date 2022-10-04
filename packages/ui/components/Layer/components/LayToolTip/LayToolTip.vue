@@ -9,33 +9,29 @@ const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void
 }>()
 
-const { visible, type } = toRefs(props)
+const { visible, type, content } = toRefs(props)
 
 // follow ref
 const referenceRefEl = ref<HTMLElement | null>(null)
 
-const { followInstance } = useToolTip(props, layerToolTipRefEl, referenceRefEl)
+const { tipsGStyles, tipsGClasses, tipsContentStyle, tipsStyles } = useToolTip(props, layerToolTipRefEl, referenceRefEl)
 </script>
 
 <template>
   <div>
     <teleport to="body">
       <!-- layer-anim-close -->
-      <div
-        v-if="visible"
-        ref="layerToolTipRefEl"
-        class="layui-layer layui-layer-tips layer-anim"
-        id="layui-layer100162"
-        type="tips"
-        times="100162"
-        showtime="3000"
-        contype="object"
-      >
-        <div id="" class="layui-layer-content">Hi，我是tips<i class="layui-layer-TipsG layui-layer-TipsR"></i></div>
+      <div v-if="visible" ref="layerToolTipRefEl" :style="tipsStyles" class="layui-layer layui-layer-tips layer-anim">
+        <div class="layui-layer-content" :style="tipsContentStyle">
+          <slot name="content">
+            {{ content }}
+          </slot>
+          <i :class="tipsGClasses" :style="tipsGStyles" class="layui-layer-TipsG"></i>
+        </div>
         <span class="layui-layer-setwin"></span>
       </div>
     </teleport>
-    <div ref="referenceRefEl">
+    <div ref="referenceRefEl" @click="emit('update:visible', !props.visible)">
       <slot></slot>
     </div>
   </div>

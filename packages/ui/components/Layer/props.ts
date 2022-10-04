@@ -23,6 +23,7 @@ export type TipsDirection = 't' | 'r' | 'b' | 'l'
 export type Tips = TipsDirection | [TipsDirection, string] // todo: [TipsDirection, string] string 为颜色值
 export type Move = 'title' | 'content' | 'footer' | boolean
 export type Follow = HTMLElement | keyof HTMLElementTagNameMap
+export type BtnType = false | 1 | 2
 
 export type LayerProps = ExtractPropTypes<typeof layerProps>
 
@@ -51,7 +52,7 @@ export const layerProps = {
    * 内容
    */
   content: {
-    type: Object
+    type: [String] as PropType<string>
   },
   /**
    * 宽高
@@ -239,6 +240,10 @@ export const layerProps = {
   minStack: {
     type: Boolean as PropType<boolean>,
     default: true
+  },
+  closeBtn: {
+    type: [Number, Boolean] as PropType<BtnType>,
+    default: false,
   },
   /**
    * tooltips
