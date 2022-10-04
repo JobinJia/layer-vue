@@ -1,7 +1,7 @@
 import { type LayerProps } from '../components/Layer/props'
-import { onMounted, Ref, ref, toRefs, unref } from 'vue'
-import { isObject } from 'lodash'
-import {getDomWidthAndHeight} from "../utils/dom";
+import { CSSProperties, onMounted, Ref, ref, toRefs, unref } from 'vue'
+import {isObject, isString} from 'lodash'
+import { getDomWidthAndHeight } from '../utils/dom'
 
 /**
  * follow 一般有三种情况:
@@ -18,6 +18,10 @@ export function useToolTip(
   const { follow, tips } = toRefs(props)
 
   const followInstance = ref<HTMLElement | null>(null)
+  const whereClasses = ref<CSSProperties>({})
+  const tipsGStyles = ref<CSSProperties>({})
+  const tipsGClasses = ref<string>('')
+
   function getFollowDom() {
     if (unref(toolTipRefEl)) {
       return
@@ -36,25 +40,30 @@ export function useToolTip(
 
     const toolTipDom = unref(toolTipRefEl)
     const layArea = [toolTipDom.offsetWidth, toolTipDom.offsetHeight]
-    const {domWidth, domHeight} = getDomWidthAndHeight(useDom)
+    const { domWidth, domHeight } = getDomWidthAndHeight(useDom)
 
     const goal = {
       width: domWidth,
       height: domHeight,
       top: useDom.offsetTop,
       left: useDom.offsetLeft,
+      tipLeft: 0
     }
-    // goal.autoLeft = function () {
-    //   if(this.left + layArea[0] - window.innerWidth > 0){
-    //     goal.tipLeft = goal.left + goal.width - layArea[0];
-    //     tipsG.css({right: 12, left: 'auto'});
-    //   } else {
-    //     goal.tipLeft = goal.left;
-    //   };
-    // }
-
+    const tipsG = toolTipRefEl.value.querySelector('.layui-layer-TipsG')
+    function autoLeft() {
+      if (goal.left + layArea[0] - window.innerWidth > 0) {
+        goal.tipLeft = goal.left + goal.width - layArea[0]
+        tipsGStyles.value = {
+          right: '12px',
+          left: 'auto'
+        }
+      } else {
+        goal.tipLeft = goal.left
+      }
+    }
     // 方位
-
+    const tipsVal = unref(tips)
+    const guide = isString(tipsVal) ? tipsVal : tipsVal[0]
   }
 
   onMounted(getFollowDom)

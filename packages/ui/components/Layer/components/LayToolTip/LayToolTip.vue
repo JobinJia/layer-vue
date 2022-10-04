@@ -2,7 +2,7 @@
 import { ref, toRefs, watchEffect } from 'vue'
 import { layerProps } from '../../props'
 import { useAutoClose } from '../../../../composables/autoClose'
-import {useToolTip} from "../../../../composables/tooltip";
+import { useToolTip } from '../../../../composables/tooltip'
 const props = defineProps(layerProps)
 const layerToolTipRefEl = ref<HTMLElement | null>(null)
 const emit = defineEmits<{
@@ -15,7 +15,6 @@ const { visible, type } = toRefs(props)
 const referenceRefEl = ref<HTMLElement | null>(null)
 
 const { followInstance } = useToolTip(props, layerToolTipRefEl, referenceRefEl)
-
 </script>
 
 <template>
