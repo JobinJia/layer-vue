@@ -4,6 +4,7 @@
 import { ref } from 'vue'
 const visible = ref(false)
 const message = ref(false)
+const messageIcon = ref(false)
 const tooltip = ref(false)
 const tooltipAutoClose= ref(false)
 </script>
@@ -12,10 +13,13 @@ const tooltipAutoClose= ref(false)
   <header>
     <TButton @click="visible = !visible">Modal</TButton>
     <TButton @click="message = !message">Message</TButton>
+    <TButton @click="messageIcon = !messageIcon">Message with Icon</TButton>
     <br/>
     <br/>
     <br/>
     <VLayer v-model:visible="visible"></VLayer>
+    <VLayer v-model:visible="visible" :area="[300, 600]" :offset="[200, 300]"></VLayer>
+    <VLayer v-model:visible="messageIcon" type="message" :icon="4"></VLayer>
     <VLayer v-model:visible="message" type="message"></VLayer>
     <div style="display: flex;flex-direction: row; justify-content: space-between">
       <VLayer v-model:visible="tooltipAutoClose" type="tips" content="RRRR" :time="3000">

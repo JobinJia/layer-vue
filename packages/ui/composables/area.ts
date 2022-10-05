@@ -1,18 +1,19 @@
 import { type LayerProps } from '../components/Layer/props'
-import { toRefs, unref } from 'vue'
+import { ref, toRefs, unref } from 'vue'
 import { isNumber } from 'lodash'
 
-export function useArea(props: LayerProps, el: HTMLElement) {
+export function useArea(props: LayerProps) {
   const { area } = toRefs(props)
-  let width = -1
-  let height = -1
+
+  const width = ref<number>(-1)
+  const height = ref<number>(-1)
   const areaVal = unref(area)
   if (isNumber(areaVal)) {
-    width = areaVal
+    width.value = areaVal
   } else if (Array.isArray(areaVal)) {
     const [cw, ch] = areaVal
-    width = cw
-    height = ch
+    width.value = cw
+    height.value = ch
   }
   return {
     width,

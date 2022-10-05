@@ -5,6 +5,7 @@ import { computed, ref } from 'vue'
 import { layerProps } from '../../props'
 import { useOffset } from '../../../../composables/offset'
 import { useAutoClose } from '../../../../composables/autoClose'
+import { useIcon } from '../../../../composables/icon'
 
 const props = defineProps(layerProps)
 
@@ -24,16 +25,25 @@ const basicStyle = computed<CSSProperties>(() => {
     top: offsetTop.value + 'px'
   }
 })
+const tipsClasses = computed(() => {
+  const clazz = props.icon === -1 ? 'layui-layer-hui' : ['layui-layer-msg']
+  return clazz
+})
 // auto close logics
 useAutoClose(props, emit)
+// icon
+const { showIcon, iconClasses } = useIcon(props)
 </script>
 <template>
   <div
-    :style="basicStyle"
     ref="layerModalRefEl"
-    class="layui-layer layui-layer-dialog layui-layer-border layui-layer-msg layui-layer-hui"
+    :class="tipsClasses"
+    :style="basicStyle"
+    class="layui-layer layui-layer-dialog layui-layer-border"
   >
-    <div id="" class="layui-layer-content">一段提示信息{{ props.time }}</div>
+    <div class="layui-layer-content" :class="{ 'layui-layer-padding': props.icon !== -1 }">
+      <i v-if="showIcon" :class="iconClasses"></i>提示信息
+    </div>
     <span class="layui-layer-setwin"></span>
   </div>
 </template>

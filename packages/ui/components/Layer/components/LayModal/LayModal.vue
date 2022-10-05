@@ -5,22 +5,38 @@ import { computed, ref } from 'vue'
 import { layerProps } from '../../props'
 import { useOffset } from '../../../../composables/offset'
 import { useAutoClose } from '../../../../composables/autoClose'
+import { useMove } from '../../../../composables/move'
+import { useArea } from '../../../../composables/area'
 
 const props = defineProps(layerProps)
 const emit = defineEmits<{
   (event: 'close', visible: boolean): void
+  (event: 'resizing'): void
+  (event: 'move-end'): void
 }>()
 
 const { zIndex } = useZIndex()
 
 const layerModalRefEl = ref<HTMLElement | null>(null)
+// move el
+const moveRefEl = ref<HTMLElement | null>(null)
+// resize el
+const resizeRefEl = ref<HTMLElement | null>(null)
+
 const { offsetTop, offsetLeft } = useOffset(props, layerModalRefEl)
+const { width, height } = useArea(props)
+// move
+useMove(props, layerModalRefEl, moveRefEl, resizeRefEl, { offsetTop, offsetLeft, width, height }, emit)
+
+
 const basicStyle = computed<CSSProperties>(() => {
   return {
     zIndex: zIndex,
     position: props.fixed ? 'fixed' : 'absolute',
     left: offsetLeft.value + 'px',
-    top: offsetTop.value + 'px'
+    top: offsetTop.value + 'px',
+    width: `${width.value}px`,
+    height: `${height.value}px`
   }
 })
 // auto close logics
@@ -29,8 +45,8 @@ useAutoClose(props, emit)
 
 <template>
   <div class="layui-layer layui-layer-dialog" ref="layerModalRefEl" :style="basicStyle">
-    <div class="layui-layer-title" style="cursor: move">信息</div>
-    <div id="" class="layui-layer-content layui-layer-padding">
+    <div ref="moveRefEl" class="layui-layer-title" style="cursor: move">信息</div>
+    <div class="layui-layer-content layui-layer-padding">
       <i class="layui-layer-ico layui-layer-ico6"></i>
       见到你真的很高兴
     </div>
@@ -41,7 +57,7 @@ useAutoClose(props, emit)
     <div class="layui-layer-btn">
       <a class="layui-layer-btn0" @click="emit('close', false)">确定</a>
     </div>
-    <span class="layui-layer-resize"></span>
+    <span ref="resizeRefEl" class="layui-layer-resize"></span>
   </div>
 </template>
 

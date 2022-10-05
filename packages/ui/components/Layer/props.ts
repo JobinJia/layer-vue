@@ -27,6 +27,8 @@ export type Tips = TipsDirection | [TipsDirection, string] // todo: [TipsDirecti
 export type Move = 'title' | 'content' | 'footer' | boolean
 export type Follow = HTMLElement | keyof HTMLElementTagNameMap
 export type BtnType = false | 1 | 2
+// export type IconType = 'warning' | 'success' | 'error' | 'question' | 'lock' | false
+export type IconType = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 export type LayerProps = ExtractPropTypes<typeof layerProps>
 
@@ -256,6 +258,10 @@ export const layerProps = {
   follow: {
     type: [String, Object] as PropType<Follow>,
     required: false // 为undefined时取slot default dom
+  },
+  icon: {
+    type: [Number] as PropType<IconType>,
+    default: -1
   }
 } as const
 

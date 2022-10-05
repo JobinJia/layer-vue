@@ -1,5 +1,5 @@
 import { type LayerProps } from '../components/Layer/props'
-import { onMounted, toRefs, unref, watch } from 'vue'
+import { toRefs, unref, watch } from 'vue'
 import { useTimeoutFn } from '@vueuse/core'
 
 export function useAutoClose(

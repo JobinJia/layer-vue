@@ -9,10 +9,23 @@
 </head>
 <body>
 <input type="button" id="btn" value="问你个问题"></input>
+<input type="button" id="btn0" value="0"></input>
+<input type="button" id="btn1" value="1"></input>
+<input type="button" id="btn2" value="2"></input>
+<input type="button" id="btn3" value="3"></input>
+<input type="button" id="btn4" value="4"></input>
+<input type="button" id="btn5" value="5"></input>
+<input type="button" id="btn6" value="6"></input>
 </body>
 </html>
 <script>
   window.onload=function(){
     layer.tips('Hi，我是tips', '#btn');
+    for(let i = 0; i < 7; i++) {
+      const dom = document.querySelector(`#btn${i}`)
+      dom.addEventListener('click', () => {
+        layer.msg('不开心。。', {icon: i});
+      })
+    }
   }
 </script>
