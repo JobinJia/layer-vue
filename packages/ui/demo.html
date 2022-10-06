@@ -20,7 +20,11 @@
 </html>
 <script>
   window.onload=function(){
-    layer.tips('Hi，我是tips', '#btn');
+    // layer.tips('Hi，我是tips', '#btn');
+    layer.open('内容', {
+      content: 'abcd',
+      resize: true,
+    })
     for(let i = 0; i < 7; i++) {
       const dom = document.querySelector(`#btn${i}`)
       dom.addEventListener('click', () => {

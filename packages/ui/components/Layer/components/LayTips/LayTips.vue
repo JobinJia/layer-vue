@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type CSSProperties } from 'vue'
+import {type CSSProperties, getCurrentInstance, unref} from 'vue'
 import { useZIndex } from '../../../../composables/zIndex'
 import { computed, ref } from 'vue'
 import { layerProps } from '../../props'
@@ -13,13 +13,13 @@ const emit = defineEmits<{
   (event: 'close', visible: boolean): void
 }>()
 
-const { zIndex } = useZIndex()
+const { zIndex } = useZIndex(props)
 
 const layerModalRefEl = ref<HTMLElement | null>(null)
 const { offsetTop, offsetLeft } = useOffset(props, layerModalRefEl)
 const basicStyle = computed<CSSProperties>(() => {
   return {
-    zIndex: zIndex,
+    zIndex: unref(zIndex),
     position: props.fixed ? 'fixed' : 'absolute',
     left: offsetLeft.value + 'px',
     top: offsetTop.value + 'px'

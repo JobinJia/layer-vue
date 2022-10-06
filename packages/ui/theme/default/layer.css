@@ -76,7 +76,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 /* 定制化 */
 .layui-layer-dialog{min-width: 300px;}
 .layui-layer-dialog .layui-layer-content{position: relative; padding:20px; line-height:24px; word-break: break-all; overflow:hidden; font-size:14px; overflow-x: hidden; overflow-y:auto;}
-.layui-layer-dialog .layui-layer-content .layui-layer-ico{position:absolute; top:16px; left:15px; _left:-40px; width:30px; height:30px;}
+.layui-layer-dialog .layui-layer-content .layui-layer-ico{position:absolute; top:16px; left:15px; _left: -40px; width:30px; height:30px;}
 .layui-layer-ico1{background-position:-30px 0 }
 .layui-layer-ico2{background-position:-60px 0;}
 .layui-layer-ico3{background-position:-90px 0;}

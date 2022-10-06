@@ -54,8 +54,6 @@ watch(
           <slot :name="name"></slot>
         </template>
       </component>
-      <!--      <LayModal v-if="visible" v-bind="dynamicProps" @close="(v) => emit('update:visible', v)"></LayModal>-->
-      <!--      <LayTips v-if="visible" v-bind="dynamicProps" @close="(v) => $emit('update:visible', v)"></LayTips>-->
     </transition>
   </teleport>
 </template>

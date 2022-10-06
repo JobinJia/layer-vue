@@ -199,7 +199,7 @@ export const layerProps = {
    */
   zIndex: {
     type: Number as PropType<number>,
-    default: 19700101
+    default: 19920115
   },
   /**
    * move - 触发拖动的元素
