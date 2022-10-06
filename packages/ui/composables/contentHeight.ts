@@ -1,5 +1,6 @@
 import { LayerProps } from '../components/Layer/props'
-import { CSSProperties, onMounted, ref, Ref, unref, watch } from 'vue'
+import { type CSSProperties, type Ref } from 'vue'
+import { onMounted, ref, unref, watch } from 'vue'
 import { getDomWidthAndHeight } from '../utils/dom'
 import { windowViewHeight } from '../utils/window'
 

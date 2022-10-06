@@ -1,4 +1,4 @@
-import { LayerProps, type Move } from '../components/Layer/props'
+import { type LayerProps, type Move } from '../components/Layer/props'
 import { computed, toRefs, unref } from 'vue'
 import { getDrawerAnimationClass } from '../utils/layer-util'
 

@@ -1,6 +1,6 @@
 import { type LayerProps } from '../components/Layer/props'
-import { type Ref, toRefs } from 'vue'
-import { onMounted, unref } from 'vue'
+import { type Ref } from 'vue'
+import { onMounted, unref, toRefs } from 'vue'
 import { getDomWidthAndHeight } from '../utils/dom'
 import { getWindowScroll, windowViewHeight, windowViewWidth } from '../utils/window'
 
@@ -88,9 +88,9 @@ export function useMove(
         e.preventDefault()
 
         offset.width.value = dict.area[0] + X
+        // set height when Y is greater then 0
         offset.height.value = dict.area[1] + Y
         dict.isResize = true
-        // config.resizing && config.resizing(layero)
         emit('resizing')
       }
     })

@@ -1,15 +1,16 @@
 import { type LayerProps } from '../components/Layer/props'
-import { type Ref } from 'vue'
+import { type Ref, watch } from 'vue'
 import { onMounted, ref, toRefs, unref } from 'vue'
 import { isNumber } from 'lodash'
 import { getDomWidthAndHeight } from '../utils/dom'
 import { windowViewWidth, windowViewHeight } from '../utils/window'
 
 export function useOffset(props: LayerProps, el: Ref<HTMLElement | null>) {
-  const { offset } = toRefs(props)
+  const { offset, visible } = toRefs(props)
   const offsetTopRef = ref(0)
   const offsetLeftRef = ref(0)
-  onMounted(() => {
+
+  function calcOffset() {
     if (!unref(el)) {
       return
     }
@@ -59,6 +60,18 @@ export function useOffset(props: LayerProps, el: Ref<HTMLElement | null>) {
     }
     offsetTopRef.value = offsetTop
     offsetLeftRef.value = offsetLeft
+  }
+
+  onMounted(() => {
+    watch(
+      visible,
+      (visibleValue) => {
+        if (visibleValue) {
+          calcOffset()
+        }
+      },
+      { immediate: true }
+    )
   })
 
   return {

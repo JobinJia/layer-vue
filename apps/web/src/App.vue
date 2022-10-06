@@ -14,14 +14,29 @@ const tooltipAutoClose= ref(false)
 <template>
   <header>
     <TButton @click="visible = !visible">Modal</TButton>
-    <TButton @click="visible2 = !visible2">Modal</TButton>
+    <TButton @click="visible2 = !visible2">Modal & InnerModal</TButton>
     <TButton @click="message = !message">Message</TButton>
     <TButton @click="messageIcon = !messageIcon">Message with Icon</TButton>
     <br/>
     <br/>
     <br/>
-    <VLayer v-model:visible="visible">
-      <span>叮叮叮叮</span>
+    <VLayer v-model:visible="visible" maxmin>
+      <div>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+      </div>
     </VLayer>
     <VLayer v-model:visible="visible2" :area="[300, 600]" :offset="[200, 300]">
       <TButton @click.stop="innerVisible = !innerVisible"></TButton>

@@ -1,5 +1,5 @@
 import { type LayerProps } from '../components/Layer/props'
-import {ref, toRefs, watch, watchEffect} from 'vue'
+import { ref, toRefs, unref, watchEffect } from 'vue'
 
 export function useComponentProps(props: LayerProps) {
   const { type } = toRefs(props)
@@ -29,7 +29,7 @@ export function useComponentProps(props: LayerProps) {
   }
 
   watchEffect(() => {
-    generateProps(props.type)
+    generateProps(unref(type))
   })
 
   return {

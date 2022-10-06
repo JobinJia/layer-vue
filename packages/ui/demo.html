@@ -21,10 +21,18 @@
 <script>
   window.onload=function(){
     // layer.tips('Hi，我是tips', '#btn');
-    layer.open('内容', {
-      content: 'abcd',
-      resize: true,
-    })
+    var index = layer.open({
+      content: `
+        <p>aaa</p>
+        <p>aaa</p>
+        <p>aaa</p>
+        <p>aaa</p>
+        <p>aaa</p>
+        <p>aaa</p>
+      `,
+      heigth: '800px',
+      icon: 5
+    });
     for(let i = 0; i < 7; i++) {
       const dom = document.querySelector(`#btn${i}`)
       dom.addEventListener('click', () => {
