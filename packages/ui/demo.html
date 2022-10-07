@@ -7,6 +7,17 @@
   <script src="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/layer.js"></script>
   <link href="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/theme/default/layer.css" rel="stylesheet">
 </head>
+<style>
+  .test {
+    width: 300px;
+    height: 300px;
+    border: 1px solid green;
+    position: fixed;
+    left: 0;
+    top: 100px;
+    transition: top 3s;
+  }
+</style>
 <body>
 <input type="button" id="btn" value="问你个问题"></input>
 <input type="button" id="btn0" value="0"></input>
@@ -16,8 +27,16 @@
 <input type="button" id="btn4" value="4"></input>
 <input type="button" id="btn5" value="5"></input>
 <input type="button" id="btn6" value="6"></input>
+<div class="test" id="test"></div>
 </body>
 </html>
+<script>
+  const btn = document.querySelector('#btn')
+  btn.addEventListener('click', () => {
+    const test = document.querySelector('#test')
+    test.style.top = '200px'
+  })
+</script>
 <script>
   window.onload=function(){
     // layer.tips('Hi，我是tips', '#btn');

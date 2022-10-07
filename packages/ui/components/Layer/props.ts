@@ -301,6 +301,7 @@ export interface LayerEmits {
  */
 export type ShadeProps = ExtractPropTypes<typeof shadeProps>
 export const shadeProps = {
+  visible: layerProps.visible,
   shade: layerProps.shade,
   shadeClose: layerProps.shadeClose
 } as const
