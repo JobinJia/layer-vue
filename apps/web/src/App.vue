@@ -4,6 +4,7 @@
 import { ref } from 'vue'
 const visible = ref(false)
 const visible2 = ref(false)
+const visible3 = ref(false)
 const innerVisible = ref(false)
 const message = ref(false)
 const messageIcon = ref(false)
@@ -14,14 +15,23 @@ const tooltipAutoClose= ref(false)
 <template>
   <header>
     <TButton @click="visible = !visible">Modal</TButton>
+    <TButton @click="visible3 = !visible3">Modal</TButton>
     <TButton @click="visible2 = !visible2">Modal & InnerModal</TButton>
     <TButton @click="message = !message">Message</TButton>
     <TButton @click="messageIcon = !messageIcon">Message with Icon</TButton>
     <br/>
     <br/>
     <br/>
-    <VLayer v-model:visible="visible" maxmin>
+    <VLayer v-model:visible="visible3" type="page" :anim="2">
       <div>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+        <p>叮叮叮叮</p>
+      </div>
+    </VLayer>
+    <VLayer v-model:visible="visible" maxmin :anim="1">
+      <div style="width: 300px">
         <p>叮叮叮叮</p>
         <p>叮叮叮叮</p>
         <p>叮叮叮叮</p>

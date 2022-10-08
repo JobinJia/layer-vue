@@ -26,28 +26,29 @@ export function removeShadeListener() {
 export function useShade(props: ShadeProps) {
   const { shade, visible } = toRefs(props)
 
-  const showShadeRef = ref(true)
-
   const shadeStyle = ref<CSSProperties>({})
 
   function calcShade() {
     const shadeVal = unref(shade)
-    console.log(shadeVal)
     if (shadeVal !== false) {
-      showShadeRef.value = true
       if (shadeVal.length === 1) {
         shadeStyle.value = {
-          opacity: shadeVal[0]
+          opacity: shadeVal[0],
+          display: 'block'
         }
       } else {
         const [opacity, backgroundColor] = shadeVal
         shadeStyle.value = {
           backgroundColor: backgroundColor as string,
-          opacity
+          opacity,
+          display: 'block'
         }
       }
     } else {
-      showShadeRef.value = false
+      shadeStyle.value = {
+        opacity: shadeVal[0],
+        display: 'none'
+      }
     }
   }
 
@@ -68,11 +69,13 @@ export function useShade(props: ShadeProps) {
   )
 
   listenerShadeChange((shade) => {
-    showShadeRef.value = shade
+    shadeStyle.value = {
+      ...unref(shadeStyle),
+      display: shade ? 'block' : 'none'
+    }
   }, false)
 
   return {
-    shadeStyle,
-    showShadeRef
+    shadeStyle
   }
 }

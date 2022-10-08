@@ -1,15 +1,25 @@
 import { type LayerProps } from '../components/Layer/props'
-import { type CSSProperties, nextTick, type Ref } from 'vue'
-import { ref, toRefs, unref, watch } from 'vue'
-import { getDomPosition, getDomWidthAndHeight } from '../utils/dom'
-import { getWindowScroll, windowViewHeight, windowViewWidth } from '../utils/window'
+import { type CSSProperties, type Ref } from 'vue'
+import { ref, toRefs, unref, watch, nextTick } from 'vue'
 import { setShade } from './shade'
+import { until, useWindowScroll, useWindowSize } from '@vueuse/core'
+import { getDomPosition, getDomWidthAndHeight, getStyle } from '../utils/dom'
+import { mergeRefObject } from '../utils/reactivity'
 
-export type LayerCache = {
+export type MaxMinPositionCache = {
   width: number
   height: number
   left: number
   top: number
+  position: CSSProperties['position']
+  overflow: CSSProperties['overflow']
+  transition: CSSProperties['transition']
+}
+
+export type MaxMinCache = {
+  position: MaxMinPositionCache | null
+  isMax: boolean
+  isMin: boolean
 }
 
 /**
@@ -18,20 +28,19 @@ export type LayerCache = {
  * @param fn
  * @param animTime 动画时间-该时间之后, 重置动画效效,保证移动时没有动画效果
  */
-async function transitionWrapper (dynamicModalStyles: Ref<CSSProperties>, fn: () => void, animTime = 0.5) {
-  dynamicModalStyles.value = {
-    transition: 'all 0.5s',
-    overflow: 'hidden'
-  }
-  await nextTick()
-  fn()
-  setTimeout(() => {
-    dynamicModalStyles.value = {
-      transition: 'unset',
-      overflow: 'auto'
-    }
-  }, animTime * 1000)
-}
+// async function transitionWrapper(dynamicModalStyles: Ref<CSSProperties>, fn: () => void, animTime = 0.5) {
+//   dynamicModalStyles.value = {
+//     transition: 'all 0.5s',
+//     overflow: 'hidden'
+//   }
+//   await nextTick()
+//   fn()
+//   setTimeout(() => {
+//     dynamicModalStyles.value = {
+//       overflow: 'hidden'
+//     }
+//   }, animTime * 1000)
+// }
 
 export function useMinMax(
   props: LayerProps,
@@ -42,15 +51,21 @@ export function useMinMax(
 ) {
   const { type, maxmin, minStack, fixed } = toRefs(props)
 
+  // windows
+  const { width: ww, height: wh } = useWindowSize()
+  const { x, y } = useWindowScroll()
+
   const openMaxMin = ref<boolean>(false)
   const showMinIcon = ref<boolean>(true)
   const showMaxIcon = ref<boolean>(true)
   const minIconClasses = ref<string[]>(['layui-layer-max'])
   const modalClasses = ref<string>('layui-layer-dialog')
 
-  let cache: LayerCache | null = null
-  let isMin: boolean = false
-  let isMax: boolean = false
+  const minMaxCache = ref<MaxMinCache>({
+    position: null,
+    isMax: false,
+    isMin: false
+  })
 
   let minIndex = 0
   const settings = {
@@ -58,6 +73,7 @@ export function useMinMax(
     height: 0, //titHeight
     position: 'fixed',
     overflow: 'hidden',
+    transition: 'all 0.5s',
     left: 0, // 181
     top: 0
   }
@@ -80,86 +96,138 @@ export function useMinMax(
     { immediate: true }
   )
 
-  function setCache() {
+  async function beforeActions() {
+    mergeRefObject(dynamicModalStyles, {
+      position: settings.position,
+      transition: settings.transition,
+      overflow: settings.overflow
+    })
+    await nextTick()
+  }
+
+  function clearTransition () {
+    // 动画时间执行完毕业, 移掉transition, 拖拽不需要动画
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        mergeRefObject(dynamicModalStyles, {
+          transition: unref(minMaxCache).position.transition
+        })
+        resolve(true)
+      }, 0.5)
+    })
+  }
+
+  async function setCache() {
+    await until(layerModalRefEl).not.toBeNull()
     const modalEle = unref(layerModalRefEl)
-    if (modalEle === null) {
-      return
-    }
-    const { domWidth: width, domHeight: height } = getDomWidthAndHeight(modalEle)
-    const { left, top } = getDomPosition(modalEle)
-    cache = {
-      width,
-      height,
-      left,
-      top
+    const { domWidth: modalWidth, domHeight: modalHeight } = getDomWidthAndHeight(modalEle)
+    const { left: modalLeft, top: modalTop } = getDomPosition(modalEle)
+    const position = getStyle(modalEle, 'position')
+    const overflow = getStyle(modalEle, 'overflow')
+    const transition = getStyle(modalEle, 'transition')
+    minMaxCache.value = {
+      ...unref(minMaxCache.value),
+      ...{
+        position: {
+          width: unref(modalWidth),
+          height: unref(modalHeight),
+          left: unref(modalLeft),
+          top: unref(modalTop),
+          position,
+          overflow,
+          transition
+        }
+      }
     }
   }
 
-  function clearCache(): LayerCache {
-    const cacheVal = unref(cache)
-    cache = null
-    return cacheVal
+  function clearCache() {
+    minMaxCache.value = {
+      position: null,
+      isMax: false,
+      isMin: false
+    }
   }
 
   async function min() {
-    isMin = true
+    minMaxCache.value.isMin = true
     setShade(false)
-    setCache()
+    await setCache()
     minIconStyles.value = {
       display: 'none'
     }
-    await transitionWrapper(dynamicModalStyles, async () => {
-      minIconClasses.value.push('layui-layer-maxmin')
-      const { domHeight: titHeight } = getDomWidthAndHeight(unref(titleRefEl))
-      settings.height = titHeight
-      if (unref(minStack)) {
-        settings.top = windowViewHeight - titHeight
-        minIndex++
-      }
-      showMinIcon.value = false
-      nature.height.value = settings.height
-      nature.width.value = settings.width
-      nature.offsetLeft.value = settings.left
-      nature.offsetTop.value = settings.top
-      await nextTick()
-    })
+    const { domHeight: titleHeight } = getDomWidthAndHeight(unref(titleRefEl))
+
+    settings.height = unref(titleHeight)
+    if (unref(minStack)) {
+      settings.top = wh.value - unref(titleHeight)
+      minIndex++
+    }
+    // dom 位置变化时, 先变形, 再移动
+    await beforeActions()
+
+    nature.height.value = settings.height
+    nature.width.value = settings.width
+    nature.offsetTop.value = settings.top
+    nature.offsetLeft.value = settings.left
+
+    minIconClasses.value.push('layui-layer-maxmin')
+    showMinIcon.value = false
+
+    await nextTick()
+
+    await clearTransition()
   }
 
-  function restore() {
-    const { width, height, left, top } = clearCache()
-    nature.width.value = width
-    nature.height.value = height
-    nature.offsetTop.value = top
-    nature.offsetLeft.value = left
+  async function restore() {
+    setShade(true)
 
     showMinIcon.value = true
-    isMin = false
-    isMax = false
-
     minIconClasses.value.pop()
+
+    if (unref(minMaxCache).position) {
+      const {
+        position: { width, height, left, top }
+      } = unref(minMaxCache)
+
+      await beforeActions()
+
+      nature.offsetLeft.value = left
+      nature.offsetTop.value = top
+      nature.width.value = width
+      nature.height.value = height
+
+      await nextTick()
+
+      await clearTransition()
+    }
+    await clearCache()
   }
 
   async function max() {
-    setShade(true)
-
-    await transitionWrapper(dynamicModalStyles, async () => {
-      if (isMin || isMax) {
-        restore()
-      } else {
-        setCache()
-        const { winScrollLeft: left, winScrollTop: top } = getWindowScroll()
-        nature.width.value = windowViewWidth
-        nature.height.value = windowViewHeight
-        nature.offsetTop.value = unref(fixed) ? 0 : left
-        nature.offsetLeft.value = unref(fixed) ? 0 : top
-
-        showMinIcon.value = false
-        minIconClasses.value.push('layui-layer-maxmin')
-
-        isMax = true
+    if (unref(minMaxCache).isMax || unref(minMaxCache).isMin) {
+      await restore()
+    } else {
+      setShade(false)
+      minIconStyles.value = {
+        display: 'none'
       }
+      showMinIcon.value = false
+      minMaxCache.value.isMax = true
+      minIconClasses.value.push('layui-layer-maxmin')
+      await setCache()
+
+      await beforeActions()
+
+      nature.width.value = ww.value
+      nature.height.value = wh.value
+      nature.offsetTop.value = unref(fixed) ? 0 : x.value
+      nature.offsetLeft.value = unref(fixed) ? 0 : y.value
+
       await nextTick()
-    })
+
+      await clearTransition()
+    }
   }
 
   return {

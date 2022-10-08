@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import {type Component } from 'vue'
+import { type Component } from 'vue'
 import { watch, useSlots } from 'vue'
-import VLayerWrapper from './VLayerWrapper.vue'
+// import VLayerWrapper from './VLayerWrapper.vue'
 import VLayerTips from './components/LayToolTip/LayToolTip.vue'
+import VLayModal from './components/LayModal/LayModal.vue'
+import VLayMessage from './components/LayMessage/LayMessage.vue'
 import { layerProps } from './props'
-import { computed, shallowRef, toRefs, unref, useAttrs, watchEffect } from 'vue'
+import { computed, shallowRef, toRefs, useAttrs } from 'vue'
+import {useComponentProps} from "../../composables/componentProps";
 const props = defineProps(layerProps)
 const attrs = useAttrs()
 const slots = useSlots()
 
 const { type } = toRefs(props)
 
-const comp = shallowRef<Component>(VLayerWrapper)
+const comp = shallowRef<Component>(VLayModal)
 
 watch(
   type,
@@ -20,16 +23,23 @@ watch(
       case 'tips':
         comp.value = VLayerTips
         break
+      case 'message':
+        comp.value = VLayMessage
+        break
       default:
+        comp.value = VLayModal
         break
     }
   },
   { immediate: true }
 )
 
+// dynamic props
+const { dynamicProps } = useComponentProps(props)
+
 const bindProps = computed(() => {
   return {
-    ...props,
+    ...dynamicProps.value,
     ...attrs
   }
 })

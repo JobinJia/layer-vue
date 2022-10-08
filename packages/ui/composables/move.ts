@@ -1,8 +1,8 @@
 import { type LayerProps } from '../components/Layer/props'
 import { type Ref } from 'vue'
-import { onMounted, unref, toRefs } from 'vue'
+import { unref, toRefs, watch } from 'vue'
+import { until, useWindowScroll, useWindowSize } from '@vueuse/core'
 import { getDomWidthAndHeight } from '../utils/dom'
-import { getWindowScroll, windowViewHeight, windowViewWidth } from '../utils/window'
 
 export function useMove(
   props: LayerProps,
@@ -11,22 +11,26 @@ export function useMove(
   resizeRefEl: Ref<HTMLElement | null>,
   offset: { offsetTop: Ref<number>; offsetLeft: Ref<number>; width: Ref<number>; height: Ref<number> },
   emit: {
-    (event: 'close', visible: boolean): void
+    (event: 'update:visible', visible: boolean): void
     (event: 'resizing'): void
     (event: 'move-end'): void
   }
 ) {
-  const { fixed, move, moveOut, resize } = toRefs(props)
+  const { fixed, move, moveOut, resize, visible } = toRefs(props)
   const dict: Record<string, any> = {}
 
-  function runMoveLogics() {
+  // window
+  const { width: ww, height: wh } = useWindowSize()
+  const { x, y } = useWindowScroll()
+  // dom bounding
+  // const { width: layWidth, height: layHeight } = useElementBounding(layerInstance)
+
+  async function runMoveLogics() {
+    await until(moveRefEl).not.toBeNull()
+    await until(resizeRefEl).not.toBeNull()
     const moveElem = unref(moveRefEl)
     const resizeElem = unref(resizeRefEl)
-    if (moveElem === null || resizeElem === null) {
-      return
-    }
-    // layer instance
-    // const { domWidth, domHeight } = getDomWidthAndHeight(unref(layerInstance))
+
     // move dom event
     moveElem.addEventListener('mousedown', (e) => {
       e.preventDefault()
@@ -43,10 +47,10 @@ export function useMove(
     // resize dom event
     resizeElem.addEventListener('mousedown', (e) => {
       e.preventDefault()
-      const { domWidth, domHeight } = getDomWidthAndHeight(unref(layerInstance))
+      const { domWidth: layWidth, domHeight: layHeight } = getDomWidthAndHeight(unref(layerInstance))
       dict.resizeStart = true
       dict.offset = [e.clientX, e.clientY]
-      dict.area = [domWidth, domHeight]
+      dict.area = [unref(layWidth), unref(layHeight)]
       // ready.moveElem.css('cursor', 'se-resize').show();
     })
 
@@ -60,16 +64,15 @@ export function useMove(
 
         e.preventDefault()
 
-        const { winScrollLeft, winScrollTop } = getWindowScroll()
-
-        dict.stX = fixedVal ? 0 : winScrollLeft
-        dict.stY = fixedVal ? 0 : winScrollTop
+        dict.stX = fixedVal ? 0 : unref(x)
+        dict.stY = fixedVal ? 0 : unref(y)
 
         //控制元素不被拖出窗口外
         if (!unref(moveOut)) {
-          const { domWidth, domHeight } = getDomWidthAndHeight(unref(layerInstance))
-          const setRig = windowViewWidth - domWidth + dict.stX
-          const setBot = windowViewHeight - domHeight + dict.stY
+          const { domWidth: layWidth, domHeight: layHeight } = getDomWidthAndHeight(unref(layerInstance))
+
+          const setRig = unref(ww) - unref(layWidth) + dict.stX
+          const setBot = unref(wh) - unref(layHeight) + dict.stY
           X < dict.stX && (X = dict.stX)
           X > setRig && (X = setRig)
           Y < dict.stY && (Y = dict.stY)
@@ -108,7 +111,14 @@ export function useMove(
       }
     })
   }
-  onMounted(() => {
-    runMoveLogics()
-  })
+
+  watch(
+    visible,
+    async (val) => {
+      if (val) {
+        await runMoveLogics()
+      }
+    },
+    { immediate: true }
+  )
 }

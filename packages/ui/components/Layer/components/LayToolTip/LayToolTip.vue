@@ -23,7 +23,7 @@ useAutoCloseByVisible(props, emit)
 </script>
 
 <template>
-  <div>
+  <span>
     <teleport to="body">
       <transition :enter-active-class="layerTransition.in" :leave-active-class="layerTransition.out">
         <div v-if="visible" ref="layerToolTipRefEl" :style="tipsStyles" class="layui-layer layui-layer-tips layer-anim">
@@ -40,5 +40,5 @@ useAutoCloseByVisible(props, emit)
     <div ref="referenceRefEl" @click="emit('update:visible', !props.visible)">
       <slot></slot>
     </div>
-  </div>
+  </span>
 </template>

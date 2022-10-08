@@ -1,22 +1,23 @@
 import { type LayerProps } from '../components/Layer/props'
-import { type Ref, watch } from 'vue'
-import { onMounted, ref, toRefs, unref } from 'vue'
+import { type Ref } from 'vue'
+import { watch, ref, toRefs, unref } from 'vue'
 import { isNumber } from 'lodash'
+import { until, useWindowSize } from '@vueuse/core'
 import { getDomWidthAndHeight } from '../utils/dom'
-import { windowViewWidth, windowViewHeight } from '../utils/window'
 
-export function useOffset(props: LayerProps, el: Ref<HTMLElement | null>) {
+export function useOffset(props: LayerProps, layerModalRefEl: Ref<HTMLElement | null>) {
   const { offset, visible } = toRefs(props)
   const offsetTopRef = ref(0)
   const offsetLeftRef = ref(0)
 
-  function calcOffset() {
-    if (!unref(el)) {
-      return
-    }
-    const [domWidth, domHeight] = getDomWidthAndHeight(el.value)
-    let offsetTop = (windowViewHeight - domHeight) / 2
-    let offsetLeft = (windowViewWidth - domWidth) / 2
+  // window
+  const { width: ww, height: wh } = useWindowSize()
+
+  async function calcOffset() {
+    await until(layerModalRefEl).not.toBeNull()
+    const [domWidth, domHeight] = getDomWidthAndHeight(layerModalRefEl.value)
+    let offsetTop = (unref(wh) - unref(domHeight)) / 2
+    let offsetLeft = (unref(ww) - unref(domWidth)) / 2
     const offsetVal = unref(offset)
     if (isNumber(offsetVal)) {
       offsetTop = offsetVal
@@ -30,10 +31,10 @@ export function useOffset(props: LayerProps, el: Ref<HTMLElement | null>) {
           offsetTop = 0
           break
         case 'r':
-          offsetLeft = windowViewWidth - domWidth
+          offsetLeft = unref(ww) - unref(domWidth)
           break
         case 'b':
-          offsetTop = windowViewHeight - domHeight
+          offsetTop = unref(wh) - unref(domHeight)
           break
         case 'l':
           offsetLeft = 0
@@ -43,16 +44,16 @@ export function useOffset(props: LayerProps, el: Ref<HTMLElement | null>) {
           offsetTop = 0
           break
         case 'lb':
-          offsetTop = windowViewHeight - domHeight
+          offsetTop = unref(wh) - unref(domHeight)
           offsetLeft = 0
           break
         case 'rt':
           offsetTop = 0
-          offsetLeft = windowViewWidth - domWidth
+          offsetLeft = unref(ww) - unref(domWidth)
           break
         case 'rb':
-          offsetTop = windowViewHeight - domHeight
-          offsetLeft = windowViewWidth - domWidth
+          offsetTop = unref(wh) - unref(domHeight)
+          offsetLeft = unref(ww) - unref(domWidth)
           break
         default:
           break
@@ -62,18 +63,23 @@ export function useOffset(props: LayerProps, el: Ref<HTMLElement | null>) {
     offsetLeftRef.value = offsetLeft
   }
 
-  onMounted(() => {
-    watch(
-      visible,
-      (visibleValue) => {
-        if (visibleValue) {
-          calcOffset()
-        }
-      },
-      { immediate: true }
-    )
-  })
+  watch(
+    offset,
+    async () => {
+      await calcOffset()
+    },
+    { immediate: true, deep: true }
+  )
 
+  watch(
+    visible,
+    async (visibleValue) => {
+      if (visibleValue) {
+        await calcOffset()
+      }
+    },
+    { immediate: true }
+  )
   return {
     offsetTop: offsetTopRef,
     offsetLeft: offsetLeftRef

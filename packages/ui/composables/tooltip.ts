@@ -1,9 +1,8 @@
 import { type LayerProps } from '../components/Layer/props'
-import { type Ref, type CSSProperties } from 'vue'
+import {type Ref, type CSSProperties, computed} from 'vue'
 import { nextTick, onMounted, ref, toRefs, unref, watch } from 'vue'
 import { isObject, isString } from 'lodash'
-import { getDomWidthAndHeight } from '../utils/dom'
-import { getWindowScroll, windowViewHeight, windowViewWidth } from '../utils/window'
+import {useElementBounding, useWindowScroll, useWindowSize} from '@vueuse/core'
 
 /**
  * follow 一般有三种情况:
@@ -19,7 +18,36 @@ export function useToolTip(
 ) {
   const { visible, follow, tips, closeBtn, fixed } = toRefs(props)
 
-  const followInstance = ref<HTMLElement | null>(null)
+  // windows
+  const { width: ww, height: wh } = useWindowSize()
+  const { x, y } = useWindowScroll()
+
+  // follow ele
+  const followEle = computed((): HTMLElement | null => {
+    // follow 为undefined, 即外部没有传值时, 取ToolTips default slot
+    if (unref(follow) === undefined) {
+      if (unref(defaultSlotRefEl) === null) {
+        return null
+      }
+      const wrapperDom = unref(defaultSlotRefEl).children
+      return wrapperDom[0] as HTMLElement
+    } else if(unref(follow) === null) {
+      return null
+    } else {
+      if (isObject(unref(follow))) {
+        return unref(follow) as HTMLElement
+      } else {
+        const selector = unref(follow) as string
+        return document.querySelector(selector)
+      }
+    }
+  })
+
+  // dom width
+  const { width: tw , height: th }  = useElementBounding(toolTipRefEl)
+  const { width: fw , height: fh, left: fl, top: ft }  = useElementBounding(followEle)
+
+  // const followInstance = ref<HTMLElement | null>(null)
 
   const tipsGStyles = ref<CSSProperties>({})
   const tipsGClasses = ref<string>('')
@@ -81,31 +109,32 @@ export function useToolTip(
   }
 
   function getFollowDom() {
-    if (unref(toolTipRefEl) === null) {
-      return
-    }
-    const wrapperDom = unref(defaultSlotRefEl).children
-    let useDom = wrapperDom[0] as HTMLElement
-    const followDom = unref(follow)
-    if (followDom !== undefined) {
-      if (isObject(followDom)) {
-        useDom = followDom
-      } else {
-        // 如果是 HtmlTagName 或 选择器 只会用第一个
-        useDom = document.querySelector(followDom)
-      }
-    }
-    followInstance.value = useDom
+    // if (unref(toolTipRefEl) === null) {
+    //   return
+    // }
+    // const wrapperDom = unref(defaultSlotRefEl).children
+    // let useDom = wrapperDom[0] as HTMLElement
+    // const followDom = unref(follow)
+    // if (followDom !== undefined) {
+    //   if (isObject(followDom)) {
+    //     useDom = followDom
+    //   } else {
+    //     // 如果是 HtmlTagName 或 选择器 只会用第一个
+    //     useDom = document.querySelector(followDom)
+    //   }
+    // }
+    // followInstance.value = useDom
 
-    const toolTipDom = unref(toolTipRefEl)
-    const layArea = [toolTipDom.offsetWidth, toolTipDom.offsetHeight]
-    const { domWidth, domHeight } = getDomWidthAndHeight(useDom)
+    // const toolTipDom = unref(toolTipRefEl)
+    // const layArea = [toolTipDom.offsetWidth, toolTipDom.offsetHeight]
+    // const { domWidth, domHeight } = getDomWidthAndHeight(useDom)
+    const layArea = [tw.value, th.value]
 
     const goal = {
-      width: domWidth,
-      height: domHeight,
-      top: useDom.offsetTop,
-      left: useDom.offsetLeft,
+      width: fw.value,
+      height: fh.value,
+      top: ft.value,
+      left: fl.value,
       tipLeft: 0,
       tipTop: 0
     }
@@ -117,16 +146,15 @@ export function useToolTip(
     where[guide]()
 
     /* 8*2为小三角形占据的空间 */
-    const { winScrollLeft, winScrollTop } = getWindowScroll()
     switch (guide) {
       case 't':
-        goal.top - (winScrollTop + layArea[1] + 8 * 2) < 0 && where['b']() //goal.where[2]();
+        goal.top - (y.value + layArea[1] + 8 * 2) < 0 && where['b']() //goal.where[2]();
         break
       case 'r':
-        windowViewWidth - (goal.left + goal.width + layArea[0] + 8 * 2) > 0 || where['l']()
+        ww.value - (goal.left + goal.width + layArea[0] + 8 * 2) > 0 || where['l']()
         break
       case 'b':
-        goal.top - winScrollTop + goal.height + layArea[1] + 8 * 2 - windowViewHeight > 0 && where['t']()
+        goal.top - y.value + goal.height + layArea[1] + 8 * 2 - wh.value > 0 && where['t']()
         break
       case 'l':
         layArea[0] + 8 * 2 - goal.left > 0 && where['r']()
@@ -142,8 +170,8 @@ export function useToolTip(
     }
 
     tipsStyles.value = {
-      left: goal.tipLeft - (unref(fixed) ? winScrollLeft : 0) + 'px',
-      top: goal.tipTop - (unref(fixed) ? winScrollTop : 0) + 'px'
+      left: goal.tipLeft - (unref(fixed) ? x.value : 0) + 'px',
+      top: goal.tipTop - (unref(fixed) ? y.value : 0) + 'px'
     }
   }
 
@@ -161,7 +189,7 @@ export function useToolTip(
   })
 
   return {
-    followInstance,
+    // followInstance,
     tipsGStyles,
     tipsGClasses,
     tipsContentStyle,

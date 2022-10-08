@@ -24,10 +24,3 @@ export function useLayerTransition(props: LayerProps) {
     layerTransition
   }
 }
-
-export function useLayerMove(move: Move) {
-  if (move === false) {
-    return ''
-  }
-  const moveClassNames = ['layui-layer-title']
-}

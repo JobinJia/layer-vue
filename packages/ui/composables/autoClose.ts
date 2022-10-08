@@ -5,12 +5,12 @@ import { useTimeoutFn } from '@vueuse/core'
 export function useAutoClose(
   props: LayerProps,
   emit: {
-    (event: 'close', visible: boolean): void
+    (event: 'update:visible', visible: boolean): void
   }
 ) {
   const { time, visible } = toRefs(props)
   function handleAutoClose() {
-    emit('close', false)
+    emit('update:visible', false)
   }
 
   const { start } = useTimeoutFn(handleAutoClose, time, { immediate: false })
@@ -34,7 +34,7 @@ export function useAutoCloseByVisible(
 ) {
   const { time, visible } = toRefs(props)
   function handleAutoClose() {
-    emit('update:visible', !props.visible)
+    emit('update:visible', false)
   }
   const { start } = useTimeoutFn(handleAutoClose, time, { immediate: false })
   watch(

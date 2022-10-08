@@ -1,8 +1,8 @@
-import { LayerProps } from '../components/Layer/props'
+import { type LayerProps } from '../components/Layer/props'
 import { type CSSProperties, type Ref } from 'vue'
-import { onMounted, ref, unref, watch } from 'vue'
-import { getDomWidthAndHeight } from '../utils/dom'
-import { windowViewHeight } from '../utils/window'
+import { ref, unref, watch, toRefs } from 'vue'
+import { until, useWindowSize } from '@vueuse/core'
+import { getDomWidthAndHeight, getStyle } from '../utils/dom'
 
 export function useContentHeight(
   props: LayerProps,
@@ -12,25 +12,28 @@ export function useContentHeight(
   btnRefEl: Ref<HTMLElement | null>,
   height: Ref<number>
 ) {
-  const { type, area, maxHeight, fixed } = unref(props)
+  const { visible, type, area, maxHeight, fixed } = toRefs(props)
   const contentStyles = ref<CSSProperties>({})
 
-  function calcContentHeight() {
-    const modalEle = unref(layerModalRefEl)
-    const moveEle = unref(moveRefEl)
+  // windows
+  const { height: wh } = useWindowSize()
+
+  async function calcContentHeight() {
+    await until(modalContentRefEl).not.toBeNull()
+    await until(moveRefEl).not.toBeNull()
+    await until(btnRefEl).not.toBeNull()
+
     const contentEle = unref(modalContentRefEl)
+    const moveEle = unref(moveRefEl)
     const btnEle = unref(btnRefEl)
-    if (moveEle === null || btnEle === null) {
-      return
-    }
 
     function setHeight() {
-      const { domWidth: titleWidth, domHeight: titleHeight } = getDomWidthAndHeight(moveEle)
-      const { domWidth: btnWidth, domHeight: btnHeight } = getDomWidthAndHeight(btnEle)
-      const paddingValue = window.getComputedStyle(contentEle, null).getPropertyValue('padding-top')
+      const { domHeight: titleHeight } = getDomWidthAndHeight(moveEle)
+      const { domHeight: btnHeight } = getDomWidthAndHeight(btnEle)
+      const paddingValue = getStyle(contentEle, 'padding-top')
       const paddingNum = paddingValue.match(/\d+/g)
       contentStyles.value = {
-        height: unref(height) - titleHeight - btnHeight - 2 * parseFloat(paddingNum + '') + 'px'
+        height: unref(height) - unref(titleHeight) - unref(btnHeight) - 2 * parseFloat(paddingNum + '') + 'px'
       }
     }
 
@@ -42,8 +45,8 @@ export function useContentHeight(
           if (unref(maxHeight) > 0 && unref(height) > unref(maxHeight)) {
             height.value = unref(maxHeight)
             setHeight()
-          } else if (unref(fixed) && area[1] >= windowViewHeight) {
-            height.value = windowViewHeight
+          } else if (unref(fixed) && areaVal[1] >= wh.value) {
+            height.value = wh.value
             setHeight()
           }
         } else {
@@ -53,12 +56,18 @@ export function useContentHeight(
     }
   }
 
-  onMounted(calcContentHeight)
-
   watch(
     height,
-    () => {
-      calcContentHeight()
+    async () => {
+      await calcContentHeight()
+    },
+    { immediate: true }
+  )
+
+  watch(
+    visible,
+    async (val) => {
+      val && (await calcContentHeight())
     },
     { immediate: true }
   )

@@ -4,8 +4,9 @@ import { useShade } from '../../../composables/shade'
 
 const props = defineProps(shadeProps)
 
-const { shadeStyle, showShadeRef } = useShade(props)
+const { shadeStyle } = useShade(props)
+
 </script>
 <template>
-  <div v-if="showShadeRef" class="layui-layer-shade" :style="shadeStyle">{{ showShadeRef }}</div>
+  <div class="layui-layer-shade" :style="shadeStyle"></div>
 </template>

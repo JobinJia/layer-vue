@@ -1,58 +1,65 @@
 import { type LayerProps } from '../components/Layer/props'
-import { toRefs, unref, watch, ref, onBeforeUnmount } from 'vue'
+import { toRefs, unref, watch, ref, onBeforeUnmount, getCurrentInstance } from 'vue'
+import { LayerCache } from './layerCache'
 
-const zIndexSet = new Set<number>()
+const cache = new LayerCache()
 
 export function useZIndex(props: LayerProps) {
+  const vm = getCurrentInstance()
+  const { uid } = vm
+
   const { zIndex, visible } = toRefs(props)
+
+  const currentIndex = ref<number>(0)
 
   watch(
     zIndex,
-    (val) => {
-      if (zIndexSet.size === 0) {
-        zIndexSet.add(val)
+    (value) => {
+      if (cache.getSize() === 0) {
+        cache.setCache(uid, { zIndex: value })
       } else {
-        const lastVal = Array.from(zIndexSet).pop()
-        zIndexSet.add(lastVal + 1)
+        const { zIndex } = cache.getLastValue()
+        cache.setCache(uid, {
+          zIndex: zIndex + 1
+        })
       }
     },
     { immediate: true }
   )
 
-  const currentIndex = ref<number>(0)
-
   watch(
     visible,
     (val) => {
-      const lastVal = Array.from(zIndexSet).pop()
       // 打开的时候 设置zIndex
       if (val) {
-        if (unref(currentIndex.value) !== lastVal) {
-          currentIndex.value = lastVal
+        const { zIndex } = cache.getLastValue()
+        if (unref(currentIndex) !== zIndex) {
+          currentIndex.value = zIndex
         } else {
-          currentIndex.value = lastVal + 1
-          zIndexSet.add(lastVal + 1)
+          currentIndex.value = zIndex + 1
+          cache.setCache(uid, {
+            zIndex: zIndex + 1
+          })
         }
       }
     },
     { immediate: true }
   )
 
-  onBeforeUnmount(() => {
-    // 离开时,当删除
-    const lastVal = Array.from(zIndexSet).pop()
-    zIndexSet.delete(lastVal)
-  })
-
   function moveToTop() {
-    const lastVal = Array.from(zIndexSet).pop()
+    const { zIndex } = cache.getLastValue()
     // 已经是最顶层, 则不处理
-    if (currentIndex.value === lastVal) return
-    zIndexSet.delete(unref(currentIndex))
-    const current = lastVal + 1
-    zIndexSet.add(current)
+    if (currentIndex.value === zIndex) return
+    // zIndexSet.delete(unref(currentIndex))
+    cache.removeCache(uid)
+    const current = zIndex + 1
+    cache.setCache(uid, { zIndex: current })
     currentIndex.value = current
   }
+
+  onBeforeUnmount(() => {
+    cache.removeCache(uid)
+  })
 
   return {
     zIndex: currentIndex,

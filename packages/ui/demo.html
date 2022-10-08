@@ -28,6 +28,8 @@
 <input type="button" id="btn5" value="5"></input>
 <input type="button" id="btn6" value="6"></input>
 <div class="test" id="test"></div>
+<input type="button" id="openPage1" value="openPage1">
+<input type="button" id="openPage2" value="openPage2">
 </body>
 </html>
 <script>
@@ -40,18 +42,42 @@
 <script>
   window.onload=function(){
     // layer.tips('Hi，我是tips', '#btn');
-    var index = layer.open({
-      content: `
-        <p>aaa</p>
-        <p>aaa</p>
-        <p>aaa</p>
-        <p>aaa</p>
-        <p>aaa</p>
-        <p>aaa</p>
-      `,
-      heigth: '800px',
-      icon: 5
-    });
+    document.querySelector('#openPage1').addEventListener('click', () => {
+      layer.open({
+        type: 1 //Page 层类型
+        ,area: ['500px', '300px']
+        ,title: 'Hello layer'
+        ,shade: 0.6 //遮罩透明度
+        ,maxmin: true //允许全屏最小化
+        ,minStack: true
+        ,anim: 1 //0-6的动画形式，-1不开启
+        ,content: '<div style="padding:50px;">这是一个非常普通的页面层，传入了自定义的 html</div>'
+      });
+    })
+    document.querySelector('#openPage2').addEventListener('click', () => {
+      layer.open({
+        type: 1 //Page 层类型
+        ,area: ['500px', '300px']
+        ,title: 'Hello layer2'
+        ,shade: 0.6 //遮罩透明度
+        ,maxmin: true, //允许全屏最小化
+        minStack: true
+        ,anim: 2 //0-6的动画形式，-1不开启
+        ,content: '<div style="padding:50px;">这是一个非常普通的页面层，传入了自定义的 html</div>'
+      });
+    })
+    // var index = layer.open({
+    //   content: `
+    //     <p>aaa</p>
+    //     <p>aaa</p>
+    //     <p>aaa</p>
+    //     <p>aaa</p>
+    //     <p>aaa</p>
+    //     <p>aaa</p>
+    //   `,
+    //   heigth: '800px',
+    //   icon: 5
+    // });
     for(let i = 0; i < 7; i++) {
       const dom = document.querySelector(`#btn${i}`)
       dom.addEventListener('click', () => {
