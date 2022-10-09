@@ -20,7 +20,7 @@ export function useZIndex(props: LayerProps) {
       } else {
         const { zIndex } = cache.getLastValue()
         cache.setCache(uid, {
-          zIndex: zIndex + 1
+          zIndex: zIndex + 2
         })
       }
     },
@@ -36,9 +36,9 @@ export function useZIndex(props: LayerProps) {
         if (unref(currentIndex) !== zIndex) {
           currentIndex.value = zIndex
         } else {
-          currentIndex.value = zIndex + 1
+          currentIndex.value = zIndex + 2
           cache.setCache(uid, {
-            zIndex: zIndex + 1
+            zIndex: zIndex + 2
           })
         }
       }
@@ -52,7 +52,7 @@ export function useZIndex(props: LayerProps) {
     if (currentIndex.value === zIndex) return
     // zIndexSet.delete(unref(currentIndex))
     cache.removeCache(uid)
-    const current = zIndex + 1
+    const current = zIndex + 2
     cache.setCache(uid, { zIndex: current })
     currentIndex.value = current
   }

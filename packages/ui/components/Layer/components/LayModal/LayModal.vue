@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type CSSProperties, toRefs } from 'vue'
+import {type CSSProperties, toRefs, watchEffect} from 'vue'
 import { type LayerProps } from '../../props'
 import { computed, ref, unref } from 'vue'
 import { useZIndex } from '../../../../composables/zIndex'
@@ -76,11 +76,12 @@ const basicStyle = computed<CSSProperties>(() => {
 })
 // auto close logics
 useAutoClose(props, emit)
+
 </script>
 
 <template>
   <teleport to="body">
-    <VLayShade v-if="showShade" v-bind="pickProps"></VLayShade>
+    <VLayShade v-if="showShade" v-bind="pickProps" :style="{ zIndex: zIndex - 1 }"></VLayShade>
     <transition :enter-active-class="layerTransition.in" :leave-active-class="layerTransition.out">
       <div
         v-if="visible"
@@ -93,9 +94,6 @@ useAutoClose(props, emit)
         <div ref="moveRefEl" class="layui-layer-title" style="cursor: move">信息{{ props.maxmin }}</div>
         <div ref="modalContentRefEl" class="layui-layer-content layui-layer-padding" :style="contentStyles">
           <i class="layui-layer-ico layui-layer-ico6"></i>
-          {{ basicStyle.left }}
-          <br />
-          {{ basicStyle.top }}
           <slot></slot>
         </div>
         <div ref="btnRefEl" class="layui-layer-btn">
@@ -110,7 +108,7 @@ useAutoClose(props, emit)
             :class="minIconClasses"
             class="layui-layer-ico layui-layer-max"
             href="javascript:;"
-            @click.stop="max"
+            @click.stop.prevent="max"
           ></a>
           <a
             class="layui-layer-ico layui-layer-close layui-layer-close1"

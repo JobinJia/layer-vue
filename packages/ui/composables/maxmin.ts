@@ -22,26 +22,6 @@ export type MaxMinCache = {
   isMin: boolean
 }
 
-/**
- * 动画套层
- * @param dynamicModalStyles
- * @param fn
- * @param animTime 动画时间-该时间之后, 重置动画效效,保证移动时没有动画效果
- */
-// async function transitionWrapper(dynamicModalStyles: Ref<CSSProperties>, fn: () => void, animTime = 0.5) {
-//   dynamicModalStyles.value = {
-//     transition: 'all 0.5s',
-//     overflow: 'hidden'
-//   }
-//   await nextTick()
-//   fn()
-//   setTimeout(() => {
-//     dynamicModalStyles.value = {
-//       overflow: 'hidden'
-//     }
-//   }, animTime * 1000)
-// }
-
 export function useMinMax(
   props: LayerProps,
   dynamicModalStyles: Ref<CSSProperties>,
@@ -49,7 +29,7 @@ export function useMinMax(
   layerModalRefEl: Ref<HTMLElement | null>,
   titleRefEl: Ref<HTMLElement | null>
 ) {
-  const { type, maxmin, minStack, fixed } = toRefs(props)
+  const { type, maxmin, minStack, fixed, visible } = toRefs(props)
 
   // windows
   const { width: ww, height: wh } = useWindowSize()
@@ -219,16 +199,26 @@ export function useMinMax(
 
       await beforeActions()
 
+      const isFixed = unref(minMaxCache).position.position === 'fixed'
+
       nature.width.value = ww.value
       nature.height.value = wh.value
-      nature.offsetTop.value = unref(fixed) ? 0 : x.value
-      nature.offsetLeft.value = unref(fixed) ? 0 : y.value
+      nature.offsetTop.value = isFixed ? 0 : x.value
+      nature.offsetLeft.value = isFixed ? 0 : y.value
 
       await nextTick()
 
       await clearTransition()
     }
   }
+
+  watch(visible, async (value) => {
+    const { isMax, isMin } = unref(minMaxCache)
+    // 关闭时, 还原
+    if (value === false && (isMin || isMax)) {
+      await restore()
+    }
+  })
 
   return {
     modalClasses,

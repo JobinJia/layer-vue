@@ -25,7 +25,9 @@ export function useArea(props: LayerProps) {
   watch(
     area,
     () => {
-      calcArea()
+      if (unref(visible)) {
+        calcArea()
+      }
     },
     { immediate: true, deep: true }
   )

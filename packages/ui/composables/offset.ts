@@ -66,7 +66,9 @@ export function useOffset(props: LayerProps, layerModalRefEl: Ref<HTMLElement | 
   watch(
     offset,
     async () => {
-      await calcOffset()
+      if (unref(visible)) {
+        await calcOffset()
+      }
     },
     { immediate: true, deep: true }
   )
