@@ -15,14 +15,14 @@ const tooltipAutoClose= ref(false)
 <template>
   <header>
     <TButton @click="visible = !visible">Modal</TButton>
-    <TButton @click="visible3 = !visible3">Modal</TButton>
+    <TButton @click="visible3 = !visible3">Modal3</TButton>
     <TButton @click="visible2 = !visible2">Modal & InnerModal</TButton>
-    <TButton @click="message = !message">Message</TButton>
-    <TButton @click="messageIcon = !messageIcon">Message with Icon</TButton>
-    <br/>
-    <br/>
-    <br/>
-    <VLayer v-model:visible="visible3" type="page" :anim="2">
+<!--    <TButton @click="message = !message">Message</TButton>-->
+<!--    <TButton @click="messageIcon = !messageIcon">Message with Icon</TButton>-->
+<!--    <br/>-->
+<!--    <br/>-->
+<!--    <br/>-->
+    <VLayer v-model:visible="visible3" maxmin type="page" :anim="2">
       <div>
         <p>叮叮叮叮</p>
         <p>叮叮叮叮</p>
@@ -30,24 +30,7 @@ const tooltipAutoClose= ref(false)
         <p>叮叮叮叮</p>
       </div>
     </VLayer>
-    <VLayer v-model:visible="visible" maxmin :anim="1">
-      <div style="width: 300px">
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-      </div>
-    </VLayer>
+    <VLayer v-model:visible="visible" maxmin :anim="1"></VLayer>
     <VLayer v-model:visible="visible2" :area="[300, 600]" :offset="[200, 300]">
       <TButton @click.stop="innerVisible = !innerVisible"></TButton>
       <VLayer v-model:visible="innerVisible">
@@ -57,22 +40,22 @@ const tooltipAutoClose= ref(false)
         </div>
       </VLayer>
     </VLayer>
-    <VLayer v-model:visible="messageIcon" type="message" :icon="4"></VLayer>
-    <VLayer v-model:visible="message" type="message"></VLayer>
-    <div style="display: flex;flex-direction: row; justify-content: space-between">
-      <VLayer v-model:visible="tooltipAutoClose" type="tips" content="RRRR" :time="3000">
-        <TButton>Default(R)</TButton>
-      </VLayer>
-      <VLayer v-model:visible="tooltip" tips="t" type="tips" content="TTTTT">
-        <TButton>Default(T)</TButton>
-      </VLayer>
-      <VLayer v-model:visible="tooltip" tips="l" type="tips" content="LLLL">
-        <TButton>Default(L)</TButton>
-      </VLayer>
-      <VLayer v-model:visible="tooltip" tips="b" type="tips" content="BBBB">
-        <TButton>Default(B)</TButton>
-      </VLayer>
-    </div>
+<!--    <VLayer v-model:visible="messageIcon" type="message" :icon="4"></VLayer>-->
+<!--    <VLayer v-model:visible="message" type="message"></VLayer>-->
+<!--    <div style="display: flex;flex-direction: row; justify-content: space-between">-->
+<!--      <VLayer v-model:visible="tooltipAutoClose" type="tips" content="RRRR" :time="3000">-->
+<!--        <TButton>Default(R)</TButton>-->
+<!--      </VLayer>-->
+<!--      <VLayer v-model:visible="tooltip" tips="t" type="tips" content="TTTTT">-->
+<!--        <TButton>Default(T)</TButton>-->
+<!--      </VLayer>-->
+<!--      <VLayer v-model:visible="tooltip" tips="l" type="tips" content="LLLL">-->
+<!--        <TButton>Default(L)</TButton>-->
+<!--      </VLayer>-->
+<!--      <VLayer v-model:visible="tooltip" tips="b" type="tips" content="BBBB">-->
+<!--        <TButton>Default(B)</TButton>-->
+<!--      </VLayer>-->
+<!--    </div>-->
     <!--    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />-->
 
     <!--    <div class="wrapper">-->

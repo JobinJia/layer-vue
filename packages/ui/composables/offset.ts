@@ -1,5 +1,5 @@
 import { type LayerProps } from '../components/Layer/props'
-import { type Ref } from 'vue'
+import { onBeforeUnmount, type Ref, watchEffect } from 'vue'
 import { watch, ref, toRefs, unref } from 'vue'
 import { isNumber } from 'lodash'
 import { until, useWindowSize } from '@vueuse/core'
@@ -16,6 +16,7 @@ export function useOffset(props: LayerProps, layerModalRefEl: Ref<HTMLElement | 
   async function calcOffset() {
     await until(layerModalRefEl).not.toBeNull()
     const [domWidth, domHeight] = getDomWidthAndHeight(layerModalRefEl.value)
+    console.log(domHeight)
     let offsetTop = (unref(wh) - unref(domHeight)) / 2
     let offsetLeft = (unref(ww) - unref(domWidth)) / 2
     const offsetVal = unref(offset)
@@ -70,7 +71,7 @@ export function useOffset(props: LayerProps, layerModalRefEl: Ref<HTMLElement | 
         await calcOffset()
       }
     },
-    { immediate: true, deep: true }
+    { deep: true, flush: 'post' }
   )
 
   watch(
@@ -80,8 +81,9 @@ export function useOffset(props: LayerProps, layerModalRefEl: Ref<HTMLElement | 
         await calcOffset()
       }
     },
-    { immediate: true }
+    { immediate: true, flush: 'post' }
   )
+
   return {
     offsetTop: offsetTopRef,
     offsetLeft: offsetLeftRef

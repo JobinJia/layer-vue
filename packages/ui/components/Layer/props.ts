@@ -249,7 +249,7 @@ export const layerProps = {
   },
   closeBtn: {
     type: [Number, Boolean] as PropType<BtnType>,
-    default: false
+    default: 1
   },
   /**
    * tooltips

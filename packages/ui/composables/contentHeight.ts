@@ -33,7 +33,9 @@ export function useContentHeight(
       const paddingValue = getStyle(contentEle, 'padding-top')
       const paddingNum = paddingValue.match(/\d+/g)
       if (unref(height) === -1) {
-        contentStyles.value = {}
+        contentStyles.value = {
+          height: 'unset'
+        }
       } else {
         contentStyles.value = {
           height: unref(height) - unref(titleHeight) - unref(btnHeight) - 2 * parseFloat(paddingNum + '') + 'px'

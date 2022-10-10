@@ -43,8 +43,11 @@ const resizeRefEl = ref<HTMLElement | null>(null)
 const btnRefEl = ref<HTMLElement | null>(null)
 
 // logics
-const { offsetTop, offsetLeft } = useOffset(props, layerModalRefEl)
 const { width, height } = useArea(props)
+
+const { contentStyles } = useContentHeight(props, layerModalRefEl, moveRefEl, modalContentRefEl, btnRefEl, height)
+
+const { offsetTop, offsetLeft } = useOffset(props, layerModalRefEl)
 
 const { zIndex, moveToTop } = useZIndex(props)
 
@@ -52,8 +55,6 @@ const dynamicModalStyles = ref<CSSProperties>({})
 
 // move
 useMove(props, layerModalRefEl, moveRefEl, resizeRefEl, { offsetTop, offsetLeft, width, height }, emit)
-
-const { contentStyles } = useContentHeight(props, layerModalRefEl, moveRefEl, modalContentRefEl, btnRefEl, height)
 
 const { modalClasses, openMaxMin, showMinIcon, minIconClasses, showMaxIcon, min, max } = useMinMax(
   props,

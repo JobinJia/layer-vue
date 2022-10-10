@@ -29,7 +29,7 @@ export function useMinMax(
   layerModalRefEl: Ref<HTMLElement | null>,
   titleRefEl: Ref<HTMLElement | null>
 ) {
-  const { type, maxmin, minStack, fixed, visible } = toRefs(props)
+  const { type, maxmin, minStack, visible } = toRefs(props)
 
   // windows
   const { width: ww, height: wh } = useWindowSize()
@@ -172,6 +172,7 @@ export function useMinMax(
 
       await beforeActions()
 
+      console.log('hhh => ', height)
       nature.offsetLeft.value = left
       nature.offsetTop.value = top
       nature.width.value = width
