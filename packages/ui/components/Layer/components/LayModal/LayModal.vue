@@ -1,123 +1,144 @@
 <script setup lang="ts">
-import {type CSSProperties, toRefs, watchEffect} from 'vue'
-import { type LayerProps } from '../../props'
-import { computed, ref, unref } from 'vue'
+import { layerProps } from '../../../Layer/props'
+import { useShade } from '../../../../composables/shade'
 import { useZIndex } from '../../../../composables/zIndex'
-import { layerProps, shadeProps } from '../../props'
-import { useOffset } from '../../../../composables/offset'
-import { useAutoClose } from '../../../../composables/autoClose'
-import { useMove } from '../../../../composables/move'
-import { useArea } from '../../../../composables/area'
-import { useContentHeight } from '../../../../composables/contentHeight'
-import { useMinMax } from '../../../../composables/maxmin'
+import { computed, ref, toRefs, unref, useSlots, watchEffect } from 'vue'
+import { useStyles } from '../../../../composables/styles'
 import { useLayerTransition } from '../../../../composables/transition'
-import { usePickProps } from '../../../../composables/pickProps'
-import VLayShade from '../LayShade.vue'
+import { useOffset } from '../../../../composables/offset'
+import { useContentStyle } from '../../../../composables/content-styles'
+import { useArea } from '../../../../composables/area'
+import { useDrag } from '../../../../composables/drag'
+import { useResize } from '../../../../composables/resize'
+import { useMaxMin } from '../../../../composables/maxmin'
+import { useGlobalCache } from '../../../../composables/global-cache'
 
 const props = defineProps(layerProps)
+const slots = useSlots()
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void
   (event: 'resizing'): void
   (event: 'move-end'): void
 }>()
 
-const { visible, type } = toRefs(props)
-// type控制是否展示 Shade层
-const showShade = computed(() => {
-  return unref(visible) && ['dialog', 'page'].includes(unref(type))
+const layerMainRefEl = ref<HTMLElement | null>(null)
+const layerTitleRefEl = ref<HTMLElement | null>(null)
+const layerContentRefEl = ref<HTMLElement | null>(null)
+const layerBtnRefEl = ref<HTMLElement | null>(null)
+const layerResizeRefEl = ref<HTMLElement | null>(null)
+
+// 全局缓存
+const { currentVmCache, updateGlobalCache } = useGlobalCache(props)
+
+const { width, height } = useArea(props, layerMainRefEl)
+
+const { contentStyle } = useContentStyle(props, {
+  layerMainRefEl,
+  layerBtnRefEl,
+  layerTitleRefEl,
+  layerContentRefEl,
+  height
 })
-// transition
-const { layerTransition } = useLayerTransition(props)
-// shade props
-const { pickProps } = usePickProps<LayerProps, typeof shadeProps>(props, shadeProps)
 
-// modal el
-const layerModalRefEl = ref<HTMLElement | null>(null)
-// move el
-const moveRefEl = ref<HTMLElement | null>(null)
-// content el
-const modalContentRefEl = ref<HTMLElement | null>(null)
-// resize el
-const resizeRefEl = ref<HTMLElement | null>(null)
-// btn el
-const btnRefEl = ref<HTMLElement | null>(null)
-
-// logics
-const { width, height } = useArea(props)
-
-const { contentStyles } = useContentHeight(props, layerModalRefEl, moveRefEl, modalContentRefEl, btnRefEl, height)
-
-const { offsetTop, offsetLeft } = useOffset(props, layerModalRefEl)
+const { visible, type, shade } = toRefs(props)
 
 const { zIndex, moveToTop } = useZIndex(props)
 
-const dynamicModalStyles = ref<CSSProperties>({})
+const { shadeStyles, showShade } = useShade(props, zIndex)
 
-// move
-useMove(props, layerModalRefEl, moveRefEl, resizeRefEl, { offsetTop, offsetLeft, width, height }, emit)
-
-const { modalClasses, openMaxMin, showMinIcon, minIconClasses, showMaxIcon, min, max } = useMinMax(
-  props,
-  dynamicModalStyles,
-  { offsetTop, offsetLeft, width, height },
-  layerModalRefEl,
-  moveRefEl
-)
-
-const basicStyle = computed<CSSProperties>(() => {
-  return {
-    zIndex: unref(zIndex),
-    position: props.fixed ? 'fixed' : 'absolute',
-    left: offsetLeft.value + 'px',
-    top: offsetTop.value + 'px',
-    width: `${width.value}px`,
-    height: `${height.value}px`,
-    ...unref(dynamicModalStyles)
-  }
+const { left, top } = useOffset(props, {
+  layerMainRefEl,
+  currentVmCache
 })
-// auto close logics
-useAutoClose(props, emit)
 
+// transition
+const { layerTransition } = useLayerTransition(props)
+// drag and resize
+useDrag(props, { moveElRef: layerTitleRefEl, layerMainRefEl, top, left })
+useResize(props, { layerMainRefEl, layerResizeRefEl, height, width })
+// max min
+const { beforeMaxMinStyles, minimize, restoreOrFull } = useMaxMin(props, {
+  layerTitleRefEl,
+  layerMainRefEl,
+  currentVmCache,
+  updateGlobalCache,
+  width,
+  height,
+  left,
+  top,
+  showShade
+})
+
+const {
+  layerStyles,
+  layerClasses,
+  showTitle,
+  titleStyles,
+  contentClasses,
+  isMax,
+  showIcon,
+  iconClasses,
+  maxIconClasses,
+  closeBtnClasses,
+  footerBtnClasses
+} = useStyles(props, {
+  currentVmCache,
+  slots,
+  zIndex,
+  width,
+  height,
+  left,
+  top,
+  beforeMaxMinStyles
+})
 </script>
 
 <template>
   <teleport to="body">
-    <VLayShade v-if="showShade" v-bind="pickProps" :style="{ zIndex: zIndex - 1 }"></VLayShade>
+    <div v-if="showShade" class="layui-layer-shade" :style="shadeStyles">
+      {{ showShade }}
+    </div>
     <transition :enter-active-class="layerTransition.in" :leave-active-class="layerTransition.out">
-      <div
-        v-if="visible"
-        class="layui-layer"
-        :class="modalClasses"
-        ref="layerModalRefEl"
-        :style="basicStyle"
-        @click.stop.prevent="moveToTop"
-      >
-        <div ref="moveRefEl" class="layui-layer-title" style="cursor: move">信息{{ props.maxmin }}</div>
-        <div ref="modalContentRefEl" class="layui-layer-content layui-layer-padding" :style="contentStyles">
-          <i class="layui-layer-ico layui-layer-ico6"></i>
-          <slot></slot>
+      <div v-if="visible" ref="layerMainRefEl" :style="layerStyles" :class="layerClasses">
+        <div
+          v-if="showTitle"
+          ref="layerTitleRefEl"
+          class="layui-layer-title"
+          :style="titleStyles"
+          @click.stop.prevent="moveToTop"
+        >
+          <slot name="title">{{ props.title }}</slot>
         </div>
-        <div ref="btnRefEl" class="layui-layer-btn">
-          <a class="layui-layer-btn0" @click.stop="emit('update:visible', false)">确定</a>
+        <div :class="contentClasses" :style="contentStyle" ref="layerContentRefEl">
+          <i v-if="showIcon" :class="iconClasses"></i>
+          <div style="display: flex; flex-direction: column">
+            {{ width }} <br/>
+            {{ height }} <br/>
+            {{ left }} <br/>
+            {{ top }} <br/>
+          </div>
+          <slot>
+            {{ props.content || '见到你so happy !' }}
+          </slot>
         </div>
         <span class="layui-layer-setwin">
-          <a v-if="showMinIcon && openMaxMin" class="layui-layer-min" href="javascript:;" @click.stop="min">
+          <a
+            v-if="isMax && !currentVmCache.maxmin.isMax && !currentVmCache.maxmin.isMin"
+            class="layui-layer-min"
+            href="javascript:;"
+            @click.stop.prevent="minimize"
+          >
             <cite></cite>
           </a>
-          <a
-            v-if="showMaxIcon && openMaxMin"
-            :class="minIconClasses"
-            class="layui-layer-ico layui-layer-max"
-            href="javascript:;"
-            @click.stop.prevent="max"
-          ></a>
-          <a
-            class="layui-layer-ico layui-layer-close layui-layer-close1"
-            href="javascript:;"
-            @click.stop="emit('update:visible', false)"
-          ></a>
+          <a v-if="isMax" :class="maxIconClasses" href="javascript:;" @click.prevent.stop="restoreOrFull"></a>
+          <a :class="closeBtnClasses" href="javascript:;" @click.stop.prevent="emit('update:visible', false)"></a>
         </span>
-        <span ref="resizeRefEl" class="layui-layer-resize"></span>
+        <div :class="footerBtnClasses" ref="layerBtnRefEl">
+          <slot name="footer">
+            <a class="layui-layer-btn0" @click.prevent.stop="emit('update:visible', false)">确定</a>
+          </slot>
+        </div>
+        <span v-if="props.resize" ref="layerResizeRefEl" class="layui-layer-resize"></span>
       </div>
     </transition>
   </teleport>

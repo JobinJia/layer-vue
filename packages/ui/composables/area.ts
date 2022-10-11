@@ -1,45 +1,47 @@
 import { type LayerProps } from '../components/Layer/props'
-import { ref, toRefs, unref, watch } from 'vue'
-import { isNumber } from 'lodash'
+import {Ref, ref, toRefs, unref, watch, watchEffect} from 'vue'
+import {until, useElementSize, useWindowSize} from '@vueuse/core'
 
-export function useArea(props: LayerProps) {
-  const { area, visible } = toRefs(props)
+export function useArea(props: LayerProps, layerMainRefEl: Ref<HTMLElement | null>) {
+  const { area, visible, maxWidth, maxHeight } = toRefs(props)
 
   const width = ref<number>(-1)
   const height = ref<number>(-1)
 
-  function calcArea() {
+  const { height: winHeight } = useWindowSize({ listenOrientation: true })
+  const { width: mainWidth } = useElementSize(layerMainRefEl)
+
+  async function calcArea() {
+    await until(layerMainRefEl).not.toBeNull()
     const areaVal = unref(area)
-    if (isNumber(areaVal)) {
-      width.value = areaVal
-    } else if (Array.isArray(areaVal)) {
-      const [cw, ch] = areaVal
-      width.value = cw
-      height.value = ch
-    } else {
-      width.value = -1
-      height.value = -1
+    const maxWidthVal = unref(maxWidth)
+
+    if (areaVal[0] === '' && maxWidthVal > 0) {
+      unref(mainWidth) > maxWidthVal && (width.value = maxWidthVal)
+    }
+    if (areaVal[1] === '') {
+      if (maxHeight.value > 0 && areaVal[1] > maxHeight.value) {
+        height.value = maxHeight.value
+      } else if (props.fixed && areaVal[1] >= winHeight.value) {
+        height.value = winHeight.value
+      }
     }
   }
 
   watch(
-    area,
-    () => {
-      if (unref(visible)) {
-        calcArea()
+    () => [visible.value, area.value],
+    async ([visibleVal]) => {
+      if (visibleVal) {
+        await calcArea()
+      } else {
+        width.value = -1
+        height.value = -1
       }
     },
-    { immediate: true, deep: true }
-  )
-
-  watch(
-    visible,
-    (value) => {
-      if (value) {
-        calcArea()
-      }
-    },
-    { immediate: true }
+    {
+      immediate: true,
+      deep: true
+    }
   )
 
   return {

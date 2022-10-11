@@ -11,12 +11,15 @@ import { useIcon } from '../../../../composables/icon'
 import { useLayerTransition } from '../../../../composables/transition'
 import { usePickProps } from '../../../../composables/pickProps'
 import VLayShade from '../LayShade.vue'
+import { useGlobalCache } from '../../../../composables/global-cache'
 
 const props = defineProps(layerProps)
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void
 }>()
+
+const { currentVmCache } = useGlobalCache(props)
 
 const { visible, type } = toRefs(props)
 
@@ -31,19 +34,23 @@ const { pickProps } = usePickProps<LayerProps, typeof shadeProps>(props, shadePr
 
 const { zIndex } = useZIndex(props)
 
-const layerModalRefEl = ref<HTMLElement | null>(null)
-const { offsetTop, offsetLeft } = useOffset(props, layerModalRefEl)
+const layerMainRefEl = ref<HTMLElement | null>(null)
+const { left, top } = useOffset(props, { layerMainRefEl, currentVmCache })
 const basicStyle = computed<CSSProperties>(() => {
   return {
     zIndex: unref(zIndex),
     position: props.fixed ? 'fixed' : 'absolute',
-    left: offsetLeft.value + 'px',
-    top: offsetTop.value + 'px'
+    left: left.value + 'px',
+    top: top.value + 'px'
   }
 })
 const tipsClasses = computed(() => {
-  const clazz = props.icon === -1 ? 'layui-layer-hui' : ['layui-layer-msg']
-  return clazz
+  return [
+    'layui-layer',
+    'layui-layer-dialog',
+    'layui-layer-border',
+    props.icon === -1 ? 'layui-layer-hui' : 'layui-layer-msg'
+  ]
 })
 // auto close logics
 useAutoClose(props, emit)
@@ -54,13 +61,7 @@ const { showIcon, iconClasses } = useIcon(props)
   <teleport to="body">
     <VLayShade v-if="showShade" v-bind="pickProps"></VLayShade>
     <transition :enter-active-class="layerTransition.in" :leave-active-class="layerTransition.out">
-      <div
-        v-if="visible"
-        ref="layerModalRefEl"
-        :class="tipsClasses"
-        :style="basicStyle"
-        class="layui-layer layui-layer-dialog layui-layer-border"
-      >
+      <div v-if="visible" ref="layerMainRefEl" :class="tipsClasses" :style="basicStyle">
         <div class="layui-layer-content" :class="{ 'layui-layer-padding': props.icon !== -1 }">
           <i v-if="showIcon" :class="iconClasses"></i>提示信息
         </div>

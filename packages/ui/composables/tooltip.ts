@@ -98,6 +98,7 @@ export function useToolTip(
         }
       },
       l: () => {
+        console.log(goal.left, layArea[0])
         goal.tipLeft = goal.left - layArea[0] - 10
         goal.tipTop = goal.top
         tipsGClasses.value = `${prefix}L`
@@ -146,6 +147,7 @@ export function useToolTip(
     where[guide]()
 
     /* 8*2为小三角形占据的空间 */
+    // const { winScrollLeft, winScrollTop } = getWindowScroll()
     switch (guide) {
       case 't':
         goal.top - (y.value + layArea[1] + 8 * 2) < 0 && where['b']() //goal.where[2]();
@@ -189,7 +191,6 @@ export function useToolTip(
   })
 
   return {
-    // followInstance,
     tipsGStyles,
     tipsGClasses,
     tipsContentStyle,

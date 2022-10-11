@@ -1,17 +1,23 @@
-import { LayerProps } from '../../../Layer/props'
-import {computed, CSSProperties, ref, Ref, SetupContext, unref} from 'vue'
+import { computed, CSSProperties, ref, Ref, SetupContext, ShallowRef, unref } from 'vue'
 import { isNumber } from 'lodash'
+import { LayerGlobalCacheRecord } from './global-cache'
+import {LayerProps} from "../components/Layer/props";
 
 export interface UseStyleOptions {
+  currentVmCache: ShallowRef<LayerGlobalCacheRecord>
   slots: SetupContext['slots']
   zIndex: Ref<number>
   width: Ref<number>
   height: Ref<number>
   left: Ref<number>
   top: Ref<number>
+  beforeMaxMinStyles: Ref<CSSProperties>
 }
 
-export function useStyles(props: LayerProps, { slots, zIndex, width, height, left, top }: UseStyleOptions) {
+export function useStyles(
+  props: LayerProps,
+  { currentVmCache, slots, zIndex, width, height, left, top, beforeMaxMinStyles }: UseStyleOptions
+) {
   // 标题
   const showTitle = computed(() => {
     return props.title || Object.keys(slots).includes('title')
@@ -41,7 +47,8 @@ export function useStyles(props: LayerProps, { slots, zIndex, width, height, lef
       height: `${height.value}px`,
       left: `${left.value}px`,
       top: `${top.value}px`,
-      position: props.fixed ? 'fixed' : 'absolute'
+      position: props.fixed ? 'fixed' : 'absolute',
+      ...unref(beforeMaxMinStyles)
     }
   })
 
@@ -61,7 +68,7 @@ export function useStyles(props: LayerProps, { slots, zIndex, width, height, lef
     ]
   })
 
-  // 图标
+  // 右上角关闭图标
   const showIcon = computed(() => {
     return props.icon !== -1
   })
@@ -88,6 +95,20 @@ export function useStyles(props: LayerProps, { slots, zIndex, width, height, lef
     ]
   })
 
+  // 最大化图标
+  const maxIconClasses = computed(() => {
+    const {
+      maxmin: { isMax, isMin }
+    } = unref(currentVmCache)
+    return [
+      'layui-layer-ico',
+      'layui-layer-max',
+      {
+        'layui-layer-maxmin': isMax || isMin
+      }
+    ]
+  })
+
   // footer
   const footerBtnClasses = computed(() => {
     return [
@@ -109,7 +130,8 @@ export function useStyles(props: LayerProps, { slots, zIndex, width, height, lef
     isMax,
     showIcon,
     iconClasses,
+    maxIconClasses,
     closeBtnClasses,
-    footerBtnClasses,
+    footerBtnClasses
   }
 }

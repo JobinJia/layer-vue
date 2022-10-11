@@ -17,11 +17,13 @@ export function useZIndex(props: LayerProps) {
     (value) => {
       if (cache.getSize() === 0) {
         cache.setCache(uid, { zIndex: value })
+        currentIndex.value = value
       } else {
         const { zIndex } = cache.getLastValue()
         cache.setCache(uid, {
           zIndex: zIndex + 2
         })
+        currentIndex.value = zIndex + 2
       }
     },
     { immediate: true }
