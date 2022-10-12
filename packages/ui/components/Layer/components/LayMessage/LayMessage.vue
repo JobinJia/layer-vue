@@ -9,9 +9,8 @@ import { useAutoClose } from '../../../../composables/autoClose'
 import { useIcon } from '../../../../composables/icon'
 import { useLayerTransition } from '../../../../composables/transition'
 import { usePickProps } from '../../../../composables/pickProps'
-import VLayShade from '../LayShade.vue'
 import { useGlobalCache } from '../../../../composables/globalCache'
-import {useShade} from "../../../../composables/shade";
+import { useShade } from '../../../../composables/shade'
 
 const props = defineProps(layerProps)
 
