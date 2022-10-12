@@ -13,67 +13,63 @@ const tooltipAutoClose = ref(false)
 </script>
 
 <template>
-  <header>
-    <TButton @click="visible = !visible">visible</TButton>
-    <TButton @click="visible3 = !visible3">visible3</TButton>
-    <TButton @click="visible2 = !visible2">Modal & InnerModal & Visible2</TButton>
-    <TButton @click="message = !message">Message</TButton>
-    <TButton @click="messageIcon = !messageIcon">Message with Icon</TButton>
-    <br />
-    <br />
-    <br />
-    <VLayer v-model:visible="visible3" title="呆萌呆萌的" maxmin type="page" :area="[300, 300]" :anim="2" :minStack="false">
+  <TButton @click="visible = !visible">visible</TButton>
+  <TButton @click="visible3 = !visible3">visible3</TButton>
+  <TButton @click="visible2 = !visible2">Modal & InnerModal & Visible2</TButton>
+  <TButton @click="message = !message">Message</TButton>
+  <TButton @click="messageIcon = !messageIcon">Message with Icon</TButton>
+  <br />
+  <br />
+  <br />
+  <VLayer v-model:visible="visible3" title="呆萌呆萌的" maxmin type="page" :area="[300, 300]" :anim="2" :minStack="false">
+    <div>
+      <p>叮叮叮叮</p>
+      <p>叮叮叮叮</p>
+      <p>叮叮叮叮</p>
+      <p>叮叮叮叮</p>
+      <p>叮叮叮叮</p>
+      <p>叮叮叮叮</p>
+      <p>叮叮叮叮</p>
+      <p>叮叮叮叮</p>
+    </div>
+  </VLayer>
+  <VLayer v-model:visible="visible" :anim="1" title="这是标题" :minStack="false" :icon="6">
+    这是内容
+  </VLayer>
+  <VLayer
+    v-model:visible="visible2"
+    maxmin
+    type="page"
+    title="v2"
+    :area="[500, 600]"
+    :offset="[10, 20]"
+    :shade="false"
+    :minStack="false"
+  >
+    <TButton @click.stop="innerVisible = !innerVisible"></TButton>
+    <VLayer v-model:visible="innerVisible" :shade="false">
       <div>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
-        <p>叮叮叮叮</p>
+        <p>123</p>
+        <p>4aa</p>
       </div>
     </VLayer>
-    <VLayer v-model:visible="visible" :anim="1" title="这是标题" :minStack="false" :icon="6">
-      这是内容
+  </VLayer>
+  <VLayer v-model:visible="messageIcon" type="message" :icon="4"></VLayer>
+  <VLayer v-model:visible="message" type="message"></VLayer>
+  <div style="display: flex;flex-direction: row; justify-content: space-between">
+    <VLayer v-model:visible="tooltipAutoClose" type="tips" content="RRRR" :time="3000">
+      <TButton>Default(R)</TButton>
     </VLayer>
-    <VLayer
-      v-model:visible="visible2"
-      maxmin
-      type="page"
-      title="v2"
-      :area="[500, 600]"
-      :offset="[10, 20]"
-      :shade="false"
-      :minStack="false"
-    >
-      <TButton @click.stop="innerVisible = !innerVisible"></TButton>
-      <VLayer v-model:visible="innerVisible" :shade="false">
-        <div>
-          <p>123</p>
-          <p>4aa</p>
-        </div>
-      </VLayer>
+    <VLayer v-model:visible="tooltip" tips="t" type="tips" content="TTTTT">
+      <TButton>Default(T)</TButton>
     </VLayer>
-    <VLayer v-model:visible="messageIcon" type="message" :icon="4"></VLayer>
-    <VLayer v-model:visible="message" type="message"></VLayer>
-    <div style="display: flex; flex-direction: row; justify-content: space-between">
-      <VLayer v-model:visible="tooltipAutoClose" type="tips" content="RRRR" :time="3000">
-        <TButton>Default(R)</TButton>
-      </VLayer>
-      <VLayer v-model:visible="tooltip" tips="t" type="tips" content="TTTTT">
-        <TButton>Default(T)</TButton>
-      </VLayer>
-      <VLayer v-model:visible="tooltip" tips="l" type="tips" content="LLLL">
-        <TButton>Default(L)</TButton>
-      </VLayer>
-      <VLayer v-model:visible="tooltip" tips="b" type="tips" content="BBBB">
-        <TButton>Default(B)</TButton>
-      </VLayer>
-    </div>
-  </header>
-
-  <!--  <RouterView />-->
+    <VLayer v-model:visible="tooltip" tips="l" type="tips" content="LLLL">
+      <TButton>Default(L)</TButton>
+    </VLayer>
+    <VLayer v-model:visible="tooltip" tips="b" type="tips" content="BBBB">
+      <TButton>Default(B)</TButton>
+    </VLayer>
+  </div>
 </template>
 
 <style scoped>
