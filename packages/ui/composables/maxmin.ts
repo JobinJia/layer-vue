@@ -1,13 +1,14 @@
-import { computed, CSSProperties, nextTick, Ref, ref, ShallowRef, toRefs, unref, watch } from 'vue'
+import { type CSSProperties, nextTick, type Ref, ref, toRefs, unref, watch } from 'vue'
 import { promiseTimeout, useWindowScroll, useWindowSize } from '@vueuse/core'
-import { LayerGlobalCacheRecord } from './global-cache'
-import {LayerProps} from "../components/Layer/props";
-import {getDomPosition, getDomWidthAndHeight} from "../utils/dom";
+import { type LayerProps } from '../components/Layer/props'
+import { getDomPosition, getDomWidthAndHeight } from '../utils/dom'
+import { LayerCache, type LayerGlobalCacheRecord } from './layerCache'
 
 export interface MaxMinOptions {
   layerMainRefEl: Ref<HTMLElement | null>
   layerTitleRefEl: Ref<HTMLElement | null>
-  currentVmCache: ShallowRef<LayerGlobalCacheRecord>
+  globalCacheData: Ref<LayerGlobalCacheRecord>
+  globalCacheIns: Ref<LayerCache>
   updateGlobalCache: (payload: Partial<LayerGlobalCacheRecord>) => void
   width: Ref<number>
   height: Ref<number>
@@ -64,12 +65,13 @@ export function useMaxMin(
     height,
     left,
     top,
-    currentVmCache,
+    globalCacheData,
+    globalCacheIns,
     updateGlobalCache,
     showShade
   }: MaxMinOptions
 ) {
-  const { maxmin, fixed, visible } = toRefs(props)
+  const { maxmin, fixed, visible, minStack } = toRefs(props)
 
   // window
   const { width: windowWidth, height: windowHeight } = useWindowSize({ listenOrientation: true })
@@ -109,14 +111,23 @@ export function useMaxMin(
         isMax: false
       }
     })
+    await nextTick()
     // 添加最小化时的动画
     await setAnimation(beforeMaxMinStyles)
     // 执行最小化样式变化
     const { domHeight } = getDomWidthAndHeight(layerTitleRefEl.value)
     width.value = MIN_SETTINGS.width
     height.value = domHeight
-    left.value = MIN_SETTINGS.left
     top.value = unref(windowHeight) - domHeight
+    if (unref(minStack)) {
+      left.value = MIN_SETTINGS.left
+    } else {
+      // 获取记录值
+      const { minStackCount } = unref(globalCacheIns)
+      left.value = 181 * minStackCount
+      // 更新打开的个数
+      globalCacheIns.value.minStackCount++
+    }
     // 动画时间为.5s. 这个时间执行完毕后. 移除掉动画样式
     await promiseTimeout(0.5 * 1000)
     await delAnimation(beforeMaxMinStyles)
@@ -124,13 +135,6 @@ export function useMaxMin(
 
   async function restore() {
     showShade.value = true
-    // 全局通知
-    updateGlobalCache({
-      maxmin: {
-        isMin: false,
-        isMax: false
-      }
-    })
     // 添加样式变画前的动画
     await setAnimation(beforeMaxMinStyles)
     // 还原样式变化
@@ -142,6 +146,20 @@ export function useMaxMin(
     await promiseTimeout(0.5 * 1000)
     await delAnimation(beforeMaxMinStyles, {
       overflow: 'visible'
+    })
+    // 如果是不是堆叠, 且是最小化状态, 则当记录值-1
+    const {
+      maxmin: { isMin }
+    } = unref(globalCacheData)
+    if (!unref(minStack) && isMin) {
+      globalCacheIns.value.minStackCount--
+    }
+    // 全局状态变化
+    updateGlobalCache({
+      maxmin: {
+        isMin: false,
+        isMax: false
+      }
     })
   }
 
@@ -174,7 +192,7 @@ export function useMaxMin(
   async function restoreOrFull() {
     const {
       maxmin: { isMin, isMax }
-    } = unref(currentVmCache)
+    } = unref(globalCacheData)
     if (isMin || isMax) {
       await restore()
     } else {
@@ -185,9 +203,10 @@ export function useMaxMin(
   // 关闭时需要重置
   watch(visible, async (val) => {
     if (!val) {
+      // 重置样式
       const {
         maxmin: { isMax, isMin }
-      } = unref(currentVmCache)
+      } = unref(globalCacheData)
       if (isMax || isMin) {
         await restore()
       }
@@ -199,7 +218,7 @@ export function useMaxMin(
     async () => {
       const {
         maxmin: { isMax }
-      } = unref(currentVmCache)
+      } = unref(globalCacheData)
       if (unref(visible) && isMax) {
         await full(false)
       }

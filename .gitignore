@@ -2,7 +2,7 @@ node_modules
 .DS_Store
 dist
 .npmrc
-.cache
+.globalCacheIns
 
 .local
 # local env files

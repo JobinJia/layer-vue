@@ -1,39 +1,40 @@
-import { CSSProperties } from 'vue'
-
 /**
  * 需要缓存全局的值, 与vue实例绑定
  */
-export interface LayerStoreRecord {
+import { maxBy, minBy } from 'lodash'
+
+export interface LayerGlobalCacheRecord {
+  // z-index
   zIndex: number
-  isMax: boolean
-  isMin: boolean
-  maxMinState: {
-    height: number
-    width: number
-    position: CSSProperties['position']
-    left: number
-    top: number
+  // max and min state
+  maxmin: {
+    isMax: boolean
+    isMin: boolean
   }
 }
 
-const DEFAULT_CACHE: LayerStoreRecord = {
+export const DEFAULT_GLOBAL_CACHE: LayerGlobalCacheRecord = {
   zIndex: 19920115,
-  isMax: false,
-  isMin: false,
-  maxMinState: {
-    height: 0,
-    width: 0,
-    position: 'fixed',
-    left: 0,
-    top: 0
+  maxmin: {
+    isMax: false,
+    isMin: false
   }
 }
 
 export class LayerCache {
-  // key: number
-  cache: Map<number, LayerStoreRecord> = new Map<number, LayerStoreRecord>()
+  cache: Map<number, LayerGlobalCacheRecord>
+  minStackCount: number
   constructor() {
-    // this.key = key
+    this.cache = new Map<number, LayerGlobalCacheRecord>()
+    this.minStackCount = 0
+  }
+  getMaxDataByKey(key: keyof LayerGlobalCacheRecord) {
+    const values = this.cache.values()
+    return maxBy([...values], (it) => it[key])
+  }
+  getMinDataByKey(key: keyof LayerGlobalCacheRecord) {
+    const values = this.cache.values()
+    return minBy([...values], (it) => it[key])
   }
   getLastValue() {
     return [...this.cache].at(-1)[1]
@@ -41,9 +42,9 @@ export class LayerCache {
   getSize() {
     return this.cache.size
   }
-  setCache(key: number, payload: Partial<LayerStoreRecord>) {
+  setCache(key: number, payload: Partial<LayerGlobalCacheRecord>) {
     if (!this.cache.has(key)) {
-      this.cache.set(key, { ...DEFAULT_CACHE, ...payload })
+      this.cache.set(key, { ...DEFAULT_GLOBAL_CACHE, ...payload })
     } else {
       const record = this.cache.get(key)
       this.cache.set(key, {

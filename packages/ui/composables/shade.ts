@@ -1,7 +1,12 @@
-import { computed, CSSProperties, ref, Ref, toRefs, unref, watch, watchEffect } from 'vue'
-import {LayerProps} from "../components/Layer/props";
+import { type CSSProperties, ref, type Ref, toRefs, unref, watch } from 'vue'
+import { type LayerProps } from '../components/Layer/props'
+import { type LayerGlobalCacheRecord } from './layerCache'
 
-export function useShade(props: LayerProps, zIndex: Ref<number>) {
+export interface ShadeOption {
+  globalCacheData: Ref<LayerGlobalCacheRecord>
+}
+
+export function useShade(props: LayerProps, { globalCacheData }: ShadeOption) {
   const { shade, type, visible } = toRefs(props)
 
   const showShade = ref<boolean>(true)
@@ -28,7 +33,7 @@ export function useShade(props: LayerProps, zIndex: Ref<number>) {
         shadeStyles.value = {
           'background-color': unref(shade)[1] || '#000',
           opacity: unref(shade)[0] || unref(shade),
-          zIndex: unref(zIndex) - 1
+          zIndex: unref(globalCacheData).zIndex - 1
         }
       }
     },

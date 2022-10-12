@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { layerProps } from '../../../Layer/props'
 import { useShade } from '../../../../composables/shade'
-import { useZIndex } from '../../../../composables/zIndex'
-import { computed, ref, toRefs, unref, useSlots, watchEffect } from 'vue'
+import { ref, toRefs, useSlots } from 'vue'
 import { useStyles } from '../../../../composables/styles'
 import { useLayerTransition } from '../../../../composables/transition'
 import { useOffset } from '../../../../composables/offset'
-import { useContentStyle } from '../../../../composables/content-styles'
+import { useContentStyle } from '../../../../composables/contentStyles'
 import { useArea } from '../../../../composables/area'
 import { useDrag } from '../../../../composables/drag'
 import { useResize } from '../../../../composables/resize'
 import { useMaxMin } from '../../../../composables/maxmin'
-import { useGlobalCache } from '../../../../composables/global-cache'
+import { useGlobalCache } from '../../../../composables/globalCache'
 
 const props = defineProps(layerProps)
 const slots = useSlots()
@@ -28,9 +27,9 @@ const layerBtnRefEl = ref<HTMLElement | null>(null)
 const layerResizeRefEl = ref<HTMLElement | null>(null)
 
 // 全局缓存
-const { currentVmCache, updateGlobalCache } = useGlobalCache(props)
+const { globalCacheIns, globalCacheData, updateGlobalCache, moveToTop } = useGlobalCache(props)
 
-const { width, height } = useArea(props, layerMainRefEl)
+const { width, height } = useArea(props, { layerMainRefEl, globalCacheData })
 
 const { contentStyle } = useContentStyle(props, {
   layerMainRefEl,
@@ -40,15 +39,13 @@ const { contentStyle } = useContentStyle(props, {
   height
 })
 
-const { visible, type, shade } = toRefs(props)
+const { visible, type } = toRefs(props)
 
-const { zIndex, moveToTop } = useZIndex(props)
-
-const { shadeStyles, showShade } = useShade(props, zIndex)
+const { shadeStyles, showShade } = useShade(props, { globalCacheData })
 
 const { left, top } = useOffset(props, {
   layerMainRefEl,
-  currentVmCache
+  globalCacheData
 })
 
 // transition
@@ -60,7 +57,8 @@ useResize(props, { layerMainRefEl, layerResizeRefEl, height, width })
 const { beforeMaxMinStyles, minimize, restoreOrFull } = useMaxMin(props, {
   layerTitleRefEl,
   layerMainRefEl,
-  currentVmCache,
+  globalCacheData,
+  globalCacheIns,
   updateGlobalCache,
   width,
   height,
@@ -82,9 +80,8 @@ const {
   closeBtnClasses,
   footerBtnClasses
 } = useStyles(props, {
-  currentVmCache,
+  globalCacheData,
   slots,
-  zIndex,
   width,
   height,
   left,
@@ -95,9 +92,7 @@ const {
 
 <template>
   <teleport to="body">
-    <div v-if="showShade" class="layui-layer-shade" :style="shadeStyles">
-      {{ showShade }}
-    </div>
+    <div v-if="showShade" class="layui-layer-shade" :style="shadeStyles"></div>
     <transition :enter-active-class="layerTransition.in" :leave-active-class="layerTransition.out">
       <div v-if="visible" ref="layerMainRefEl" :style="layerStyles" :class="layerClasses">
         <div
@@ -111,19 +106,13 @@ const {
         </div>
         <div :class="contentClasses" :style="contentStyle" ref="layerContentRefEl">
           <i v-if="showIcon" :class="iconClasses"></i>
-          <div style="display: flex; flex-direction: column">
-            {{ width }} <br/>
-            {{ height }} <br/>
-            {{ left }} <br/>
-            {{ top }} <br/>
-          </div>
           <slot>
-            {{ props.content || '见到你so happy !' }}
+            {{ props.content }}
           </slot>
         </div>
         <span class="layui-layer-setwin">
           <a
-            v-if="isMax && !currentVmCache.maxmin.isMax && !currentVmCache.maxmin.isMin"
+            v-if="isMax && !globalCacheData.maxmin.isMax && !globalCacheData.maxmin.isMin"
             class="layui-layer-min"
             href="javascript:;"
             @click.stop.prevent="minimize"
@@ -143,5 +132,3 @@ const {
     </transition>
   </teleport>
 </template>
-
-<style scoped lang="css"></style>

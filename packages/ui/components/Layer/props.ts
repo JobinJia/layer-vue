@@ -194,12 +194,13 @@ export const layerProps = {
     type: Number as PropType<number>
   },
   /**
-   * 层叠顺序 ?
-   * 类型：，默认：19700101
+   * 层叠顺序
+   * 类型：，默认：19920115
+   * 如果用户指定, 当打开多个实例时,可能会出现层叠问题
    */
   zIndex: {
-    type: Number as PropType<number>,
-    default: 19920115
+    type: [Number, Boolean] as PropType<number | boolean>,
+    default: false
   },
   /**
    * move - 触发拖动的元素

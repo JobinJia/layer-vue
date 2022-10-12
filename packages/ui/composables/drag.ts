@@ -1,7 +1,7 @@
-import {computed, Ref, toRefs, unref, watch, watchEffect} from "vue";
-import {until, useDraggable, useWindowScroll, useWindowSize} from "@vueuse/core";
-import {LayerProps} from "../components/Layer/props";
-import {getDomWidthAndHeight, getStyle} from "../utils/dom";
+import { computed, type Ref, toRefs, unref } from 'vue'
+import { useDraggable, useWindowScroll, useWindowSize } from '@vueuse/core'
+import { type LayerProps } from '../components/Layer/props'
+import { getDomWidthAndHeight, getStyle } from '../utils/dom'
 
 export interface DragOptions {
   moveElRef: Ref<HTMLElement | null>
@@ -25,7 +25,7 @@ export function useDrag(props: LayerProps, { moveElRef, left, top, layerMainRefE
 
   const state = {
     canDrag: true,
-    offset: [0, 0],
+    offset: [0, 0]
   }
 
   useDraggable(moveElRef, {
@@ -35,10 +35,7 @@ export function useDrag(props: LayerProps, { moveElRef, left, top, layerMainRefE
     onStart(_, e) {
       const leftVal = getStyle(layerMainRefEl.value, 'left')
       const topVal = getStyle(layerMainRefEl.value, 'top')
-      state.offset = [
-        e.clientX - parseFloat(leftVal),
-        e.clientY - parseFloat(topVal)
-      ];
+      state.offset = [e.clientX - parseFloat(leftVal), e.clientY - parseFloat(topVal)]
     },
     onMove(_, e) {
       let X = e.clientX - state.offset[0]

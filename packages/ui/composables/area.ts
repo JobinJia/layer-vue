@@ -1,8 +1,15 @@
 import { type LayerProps } from '../components/Layer/props'
-import {Ref, ref, toRefs, unref, watch, watchEffect} from 'vue'
-import {until, useElementSize, useWindowSize} from '@vueuse/core'
+import { type Ref } from 'vue'
+import { type LayerGlobalCacheRecord } from './layerCache'
+import { ref, toRefs, unref, watch } from 'vue'
+import { until, useElementSize, useWindowSize } from '@vueuse/core'
 
-export function useArea(props: LayerProps, layerMainRefEl: Ref<HTMLElement | null>) {
+export interface AreaOption {
+  layerMainRefEl: Ref<HTMLElement | null>
+  globalCacheData: Ref<LayerGlobalCacheRecord>
+}
+
+export function useArea(props: LayerProps, { layerMainRefEl, globalCacheData }: AreaOption) {
   const { area, visible, maxWidth, maxHeight } = toRefs(props)
 
   const width = ref<number>(-1)
@@ -12,6 +19,10 @@ export function useArea(props: LayerProps, layerMainRefEl: Ref<HTMLElement | nul
   const { width: mainWidth } = useElementSize(layerMainRefEl)
 
   async function calcArea() {
+    // 最小化时不计算宽高
+    if (unref(globalCacheData).maxmin.isMin) {
+      return
+    }
     await until(layerMainRefEl).not.toBeNull()
     const areaVal = unref(area)
     const maxWidthVal = unref(maxWidth)
@@ -26,6 +37,9 @@ export function useArea(props: LayerProps, layerMainRefEl: Ref<HTMLElement | nul
         height.value = winHeight.value
       }
     }
+
+    width.value = areaVal[0]
+    height.value = areaVal[1]
   }
 
   watch(

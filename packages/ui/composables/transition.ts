@@ -1,6 +1,6 @@
-import { type LayerProps, type Move } from '../components/Layer/props'
+import { type LayerProps } from '../components/Layer/props'
 import { computed, toRefs, unref } from 'vue'
-import { getDrawerAnimationClass } from '../utils/layer-util'
+import { getDrawerAnimationClass } from '../utils/layerUtil'
 
 export interface LayerTransition {
   in: string

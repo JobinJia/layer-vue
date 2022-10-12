@@ -1,12 +1,11 @@
-import { computed, CSSProperties, ref, Ref, SetupContext, ShallowRef, unref } from 'vue'
+import { computed, type CSSProperties, type Ref, type SetupContext, unref } from 'vue'
 import { isNumber } from 'lodash'
-import { LayerGlobalCacheRecord } from './global-cache'
-import {LayerProps} from "../components/Layer/props";
+import { type LayerProps } from '../components/Layer/props'
+import { type LayerGlobalCacheRecord } from './layerCache'
 
 export interface UseStyleOptions {
-  currentVmCache: ShallowRef<LayerGlobalCacheRecord>
+  globalCacheData: Ref<LayerGlobalCacheRecord>
   slots: SetupContext['slots']
-  zIndex: Ref<number>
   width: Ref<number>
   height: Ref<number>
   left: Ref<number>
@@ -16,7 +15,7 @@ export interface UseStyleOptions {
 
 export function useStyles(
   props: LayerProps,
-  { currentVmCache, slots, zIndex, width, height, left, top, beforeMaxMinStyles }: UseStyleOptions
+  { globalCacheData, slots, width, height, left, top, beforeMaxMinStyles }: UseStyleOptions
 ) {
   // 标题
   const showTitle = computed(() => {
@@ -42,7 +41,7 @@ export function useStyles(
 
   const layerStyles = computed((): CSSProperties => {
     return {
-      zIndex: unref(zIndex),
+      zIndex: unref(globalCacheData).zIndex,
       width: `${width.value}px`,
       height: `${height.value}px`,
       left: `${left.value}px`,
@@ -99,7 +98,7 @@ export function useStyles(
   const maxIconClasses = computed(() => {
     const {
       maxmin: { isMax, isMin }
-    } = unref(currentVmCache)
+    } = unref(globalCacheData)
     return [
       'layui-layer-ico',
       'layui-layer-max',

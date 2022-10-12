@@ -2,7 +2,6 @@
 import { type CSSProperties } from 'vue'
 import { type LayerProps } from '../../props'
 import { toRefs, unref } from 'vue'
-import { useZIndex } from '../../../../composables/zIndex'
 import { computed, ref } from 'vue'
 import { layerProps, shadeProps } from '../../props'
 import { useOffset } from '../../../../composables/offset'
@@ -11,7 +10,8 @@ import { useIcon } from '../../../../composables/icon'
 import { useLayerTransition } from '../../../../composables/transition'
 import { usePickProps } from '../../../../composables/pickProps'
 import VLayShade from '../LayShade.vue'
-import { useGlobalCache } from '../../../../composables/global-cache'
+import { useGlobalCache } from '../../../../composables/globalCache'
+import {useShade} from "../../../../composables/shade";
 
 const props = defineProps(layerProps)
 
@@ -19,26 +19,22 @@ const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void
 }>()
 
-const { currentVmCache } = useGlobalCache(props)
+const { globalCacheData } = useGlobalCache(props)
 
 const { visible, type } = toRefs(props)
 
 // type控制是否展示 Shade层
-const showShade = computed(() => {
-  return unref(visible) && ['dialog', 'page'].includes(unref(type))
-})
+const { shadeStyles, showShade } = useShade(props, { globalCacheData })
 // transition
 const { layerTransition } = useLayerTransition(props)
 // shade props
 const { pickProps } = usePickProps<LayerProps, typeof shadeProps>(props, shadeProps)
 
-const { zIndex } = useZIndex(props)
-
 const layerMainRefEl = ref<HTMLElement | null>(null)
-const { left, top } = useOffset(props, { layerMainRefEl, currentVmCache })
+const { left, top } = useOffset(props, { layerMainRefEl, globalCacheData })
 const basicStyle = computed<CSSProperties>(() => {
   return {
-    zIndex: unref(zIndex),
+    zIndex: unref(globalCacheData).zIndex,
     position: props.fixed ? 'fixed' : 'absolute',
     left: left.value + 'px',
     top: top.value + 'px'
@@ -59,7 +55,7 @@ const { showIcon, iconClasses } = useIcon(props)
 </script>
 <template>
   <teleport to="body">
-    <VLayShade v-if="showShade" v-bind="pickProps"></VLayShade>
+    <div v-if="showShade" class="layui-layer-shade" :style="shadeStyles"></div>
     <transition :enter-active-class="layerTransition.in" :leave-active-class="layerTransition.out">
       <div v-if="visible" ref="layerMainRefEl" :class="tipsClasses" :style="basicStyle">
         <div class="layui-layer-content" :class="{ 'layui-layer-padding': props.icon !== -1 }">

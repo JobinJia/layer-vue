@@ -1,7 +1,8 @@
-import { CSSProperties, nextTick, onMounted, Ref, ref, toRefs, unref, watch } from 'vue'
-import { until, useElementBounding, useElementSize, useWindowSize } from '@vueuse/core'
-import {LayerProps} from "../components/Layer/props";
-import {getDomWidthAndHeight, getStyle} from "../utils/dom";
+import type { CSSProperties, Ref } from 'vue'
+import type { LayerProps } from '../components/Layer/props'
+import { ref, toRefs, unref, watch } from 'vue'
+import { until } from '@vueuse/core'
+import { getDomWidthAndHeight, getStyle } from '../utils/dom'
 
 export interface ContentStylesOptions {
   layerMainRefEl: Ref<HTMLElement | null>

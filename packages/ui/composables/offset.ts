@@ -1,28 +1,16 @@
-import {
-  ref,
-  Ref,
-  toRefs,
-  unref,
-  watch,
-} from 'vue'
-import {until, useWindowSize} from '@vueuse/core'
+import { ref, type Ref, toRefs, unref, watch } from 'vue'
+import { until, useWindowSize } from '@vueuse/core'
 import { isNumber } from 'lodash'
-import { LayerGlobalCacheRecord} from "./global-cache";
-import {LayerProps} from "../components/Layer/props";
-import {getDomWidthAndHeight} from "../utils/dom";
+import { type LayerProps } from '../components/Layer/props'
+import { getDomWidthAndHeight } from '../utils/dom'
+import { type LayerGlobalCacheRecord } from './layerCache'
 
 export interface OffsetOption {
   layerMainRefEl: Ref<HTMLElement | null>
-  currentVmCache: Ref<LayerGlobalCacheRecord>
+  globalCacheData: Ref<LayerGlobalCacheRecord>
 }
 
-export function useOffset(
-  props: LayerProps,
-  {
-    layerMainRefEl,
-    currentVmCache
-  }: OffsetOption
-) {
+export function useOffset(props: LayerProps, { layerMainRefEl, globalCacheData }: OffsetOption) {
   const { visible } = toRefs(props)
 
   const left = ref<number>(0)
@@ -90,9 +78,9 @@ export function useOffset(
     () => [visible.value, windowWidth.value, windowHeight.value],
     async ([visibleVal]) => {
       if (visibleVal) {
-        const globalCache = unref(currentVmCache)
+        const globalCache = unref(globalCacheData)
         if (!globalCache.maxmin.isMax && !globalCache.maxmin.isMin) {
-          calcOffset()
+          await calcOffset()
         }
       }
     },

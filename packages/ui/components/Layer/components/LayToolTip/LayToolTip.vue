@@ -17,7 +17,10 @@ const { layerTransition } = useLayerTransition(props)
 // follow ref
 const referenceRefEl = ref<HTMLElement | null>(null)
 
-const { tipsGStyles, tipsGClasses, tipsContentStyle, tipsStyles } = useToolTip(props, layerToolTipRefEl, referenceRefEl)
+const { tipsGStyles, tipsGClasses, tipsContentStyle, tipsStyles } = useToolTip(props, {
+  layerToolTipRefEl,
+  referenceRefEl
+})
 // 自动关闭
 useAutoCloseByVisible(props, emit)
 </script>
