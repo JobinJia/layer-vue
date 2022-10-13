@@ -1,12 +1,13 @@
-import { type ExtractPropTypes, PropType } from 'vue'
+import type { ExtractPropTypes, PropType } from 'vue'
 
 // type中移除page 如果要使用 可以 在default slot中 div v-html="xxx
 // 原来的1 = page 现更正为message
 // export type LayerType = 0 | 1 | 2 | 3 | 4 // | 'dialog(modal)' | 'message' | 'iframe' | 'loading' | 'tips';
 export type LayerType = 'dialog' | 'page' | 'iframe' | 'loading' | 'tips' | 'message'
 export type LayerTransitionType = 0 | 1 | 2 | 3 | 4 | 5 | 6
+export type LayerLoadingType = 0 | 1 | 2
 
-export type Area = number | [number, number] | 'auto'
+export type Area = number | [number, number] | ['', number] | 'auto'
 export type Offset =
   | number
   | [number, number] // 去掉px, 由内部实现
@@ -33,9 +34,7 @@ export type IconType = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6
 export type LayerProps = ExtractPropTypes<typeof layerProps>
 
 export const layerProps = {
-  visible: {
-    type: Boolean as PropType<boolean>
-  },
+  visible: Boolean,
   /**
    * layer提供了5种层类型。
    * 可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）。
@@ -57,9 +56,7 @@ export const layerProps = {
   /**
    * 内容
    */
-  content: {
-    type: [String] as PropType<string>
-  },
+  content: String,
   /**
    * 宽高
    * 类型：String/Array，默认：'auto'
@@ -103,7 +100,7 @@ export const layerProps = {
    * 如果你的shade是存在的，那么你可以设定shadeClose来控制点击弹层外区域关闭。
    */
   shadeClose: {
-    type: Boolean as PropType<boolean>,
+    type: Boolean,
     default: false
   },
   /**
@@ -112,7 +109,7 @@ export const layerProps = {
    * 默认不会自动关闭。当你想自动关闭时，可以time: 5000，即代表5秒后自动关闭，注意单位是毫秒（1秒=1000毫秒）
    */
   time: {
-    type: Number as PropType<number>,
+    type: Number,
     default: 0
   },
   /**
@@ -128,7 +125,7 @@ export const layerProps = {
    * anim: 6	抖动
    */
   anim: {
-    type: Number as PropType<AnimationType>,
+    type: Number,
     default: 0
   },
   /**
@@ -137,7 +134,7 @@ export const layerProps = {
    * 默认情况下，关闭层时会有一个过度动画。如果你不想开启，设置 isOutAnim: false 即可
    */
   isOutAnim: {
-    type: Boolean as PropType<boolean>,
+    type: Boolean,
     default: true
   },
   /**
@@ -146,7 +143,7 @@ export const layerProps = {
    * 该参数值对type:1和type:2有效。默认不显示最大小化按钮。需要显示配置maxmin: true即可
    */
   maxmin: {
-    type: Boolean as PropType<boolean>,
+    type: Boolean,
     default: false
   },
   /**
@@ -155,7 +152,7 @@ export const layerProps = {
    * 即鼠标滚动时，层是否固定在可视区域。如果不想，设置fixed: false即可
    */
   fixed: {
-    type: Boolean as PropType<boolean>,
+    type: Boolean,
     default: true
   },
   /**
@@ -164,7 +161,7 @@ export const layerProps = {
    * 默认情况下，你可以在弹层右下角拖动来拉伸尺寸。如果对指定的弹层屏蔽该功能，设置 false即可。该参数对loading、tips层无效
    */
   resize: {
-    type: Boolean as PropType<boolean>,
+    type: Boolean,
     default: true
   },
   /**
@@ -173,7 +170,7 @@ export const layerProps = {
    * 默认允许浏览器滚动，如果设定scrollbar: false，则屏蔽
    */
   scrollbar: {
-    type: Boolean as PropType<boolean>,
+    type: Boolean,
     default: true
   },
   /**
@@ -182,7 +179,7 @@ export const layerProps = {
    * 请注意：只有当area: 'auto'时，maxWidth的设定才有效。
    */
   maxWidth: {
-    type: Number as PropType<number>,
+    type: Number,
     default: 360
   },
   /**
@@ -190,9 +187,7 @@ export const layerProps = {
    * 类型：Number，默认：无
    * 请注意：只有当高度自适应时，maxHeight的设定才有效。
    */
-  maxHeight: {
-    type: Number as PropType<number>
-  },
+  maxHeight: Number,
   /**
    * 层叠顺序
    * 类型：，默认：19920115
@@ -263,8 +258,12 @@ export const layerProps = {
   icon: {
     type: [Number] as PropType<IconType>,
     default: -1
+  },
+  loadingType: {
+    type: Number as PropType<LayerLoadingType>,
+    default: 0
   }
-} as const
+}
 
 export interface LayerEmits {
   /**

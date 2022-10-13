@@ -1,4 +1,4 @@
-import { type LayerProps } from '../components/Layer/props'
+import type { LayerProps } from '../components/Layer/props'
 import { ref, toRefs, unref, watchEffect } from 'vue'
 
 export function useComponentProps(props: LayerProps) {

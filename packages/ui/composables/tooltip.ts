@@ -1,5 +1,6 @@
-import { type LayerProps } from '../components/Layer/props'
-import { type Ref, type CSSProperties, computed } from 'vue'
+import type { LayerProps } from '../components/Layer/props'
+import type { Ref, CSSProperties } from 'vue'
+import { computed } from 'vue'
 import { ref, toRefs, unref, watch } from 'vue'
 import { isObject, isString } from 'lodash'
 import { useElementBounding, useElementSize, useWindowScroll, useWindowSize } from '@vueuse/core'
@@ -9,6 +10,13 @@ export interface TooltipOption {
   referenceRefEl: Ref<HTMLElement | null>
 }
 
+export interface ToolTipReturn {
+  tipsGStyles: Ref<CSSProperties>
+  tipsGClasses: Ref<string>
+  tipsContentStyle: Ref<CSSProperties>
+  tipsStyles: Ref<CSSProperties>
+}
+
 /**
  * follow 一般有三种情况:
  * 1. 默认为 LayToolTip的default slot
@@ -16,7 +24,7 @@ export interface TooltipOption {
  * 3. 极端情况下, 可能需要用到选择器来获取Dom元素
  * 优先级: 1 > 2 = 3
  */
-export function useToolTip(props: LayerProps, { layerToolTipRefEl, referenceRefEl }: TooltipOption) {
+export function useToolTip(props: LayerProps, { layerToolTipRefEl, referenceRefEl }: TooltipOption): ToolTipReturn {
   const { visible, follow, tips, closeBtn, fixed } = toRefs(props)
 
   // windows

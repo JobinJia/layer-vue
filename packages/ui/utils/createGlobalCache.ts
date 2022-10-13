@@ -9,7 +9,7 @@ export function createGlobalCache<T>(factory: () => T): CreateGlobalCacheReturn<
 
   return () => {
     if (!initialized) {
-      state = scope.run(factory)
+      state = scope.run(factory)!
       initialized = true
     }
     tryOnScopeDispose(() => {

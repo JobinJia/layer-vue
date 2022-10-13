@@ -1,4 +1,4 @@
-import { type LayerProps } from '../components/Layer/props'
+import type { LayerProps } from '../components/Layer/props'
 import { toRefs, unref, watch } from 'vue'
 import { useTimeoutFn } from '@vueuse/core'
 

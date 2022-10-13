@@ -1,5 +1,5 @@
-import { type LayerGlobalCacheRecord } from './layerCache'
-import { type LayerProps } from '../components/Layer/props'
+import type { LayerGlobalCacheRecord } from './layerCache'
+import type { LayerProps } from '../components/Layer/props'
 import { getCurrentInstance, ref, toRefs, watch } from 'vue'
 import { createGlobalCache } from '../utils/createGlobalCache'
 import { DEFAULT_GLOBAL_CACHE, LayerCache } from './layerCache'

@@ -1,9 +1,12 @@
-import { ref, type Ref, toRefs, unref, watch } from 'vue'
+import type { Ref } from 'vue'
+import type { LayerGlobalCacheRecord } from './layerCache'
+import type { LayerProps } from '../components/Layer/props'
+
+import { ref, toRefs, unref, watch } from 'vue'
 import { until, useWindowSize } from '@vueuse/core'
 import { isNumber } from 'lodash'
-import { type LayerProps } from '../components/Layer/props'
 import { getDomWidthAndHeight } from '../utils/dom'
-import { type LayerGlobalCacheRecord } from './layerCache'
+
 
 export interface OffsetOption {
   layerMainRefEl: Ref<HTMLElement | null>

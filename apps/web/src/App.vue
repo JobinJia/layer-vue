@@ -1,14 +1,15 @@
 <script setup lang="ts">
 // import { RouterLink, RouterView } from 'vue-router'
 // import HelloWorld from './components/HelloWorld.vue'
-import { ref } from 'vue'
+import { TButton, VLayer } from 'ui';
+import { ref } from 'vue';
 const visible = ref(false)
 const visible2 = ref(false)
-const visible3 = ref(false)
+const visible3 = ref<boolean>(false)
 const innerVisible = ref(false)
 const message = ref(false)
 const messageIcon = ref(false)
-const tooltip = ref(false)
+const tooltip = ref<boolean>(false)
 const tooltipAutoClose = ref(false)
 </script>
 
@@ -21,7 +22,15 @@ const tooltipAutoClose = ref(false)
   <br />
   <br />
   <br />
-  <VLayer v-model:visible="visible3" title="呆萌呆萌的" maxmin type="page" :area="[300, 300]" :anim="2" :minStack="false">
+  <VLayer
+    v-model:visible="visible3"
+    title="呆萌呆萌的"
+    maxmin
+    type="page"
+    :area="[300, 300]"
+    :anim="2"
+    :minStack="false"
+  >
     <div>
       <p>叮叮叮叮</p>
       <p>叮叮叮叮</p>
@@ -33,9 +42,7 @@ const tooltipAutoClose = ref(false)
       <p>叮叮叮叮</p>
     </div>
   </VLayer>
-  <VLayer v-model:visible="visible" :anim="1" title="这是标题" :minStack="false" :icon="6">
-    这是内容
-  </VLayer>
+  <VLayer v-model:visible="visible" :anim="1" title="这是标题" :minStack="false" :icon="6"> 这是内容 </VLayer>
   <VLayer
     v-model:visible="visible2"
     maxmin
@@ -56,7 +63,7 @@ const tooltipAutoClose = ref(false)
   </VLayer>
   <VLayer v-model:visible="messageIcon" type="message" :icon="4"></VLayer>
   <VLayer v-model:visible="message" type="message"></VLayer>
-  <div style="display: flex;flex-direction: row; justify-content: space-between">
+  <div style="display: flex; flex-direction: row; justify-content: space-between">
     <VLayer v-model:visible="tooltipAutoClose" type="tips" content="RRRR" :time="3000">
       <TButton>Default(R)</TButton>
     </VLayer>
@@ -69,6 +76,7 @@ const tooltipAutoClose = ref(false)
     <VLayer v-model:visible="tooltip" tips="b" type="tips" content="BBBB">
       <TButton>Default(B)</TButton>
     </VLayer>
+    <!--    <VLayer :visible="true" type="loading" :loadingType="2" :shade="false"></VLayer>-->
   </div>
 </template>
 

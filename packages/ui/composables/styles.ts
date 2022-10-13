@@ -1,7 +1,8 @@
-import { computed, type CSSProperties, type Ref, type SetupContext, unref } from 'vue'
+import type { SetupContext, CSSProperties, Ref } from 'vue'
+import type { LayerProps } from '../components/Layer/props'
+import type { LayerGlobalCacheRecord } from './layerCache'
+import { computed, unref } from 'vue'
 import { isNumber } from 'lodash'
-import { type LayerProps } from '../components/Layer/props'
-import { type LayerGlobalCacheRecord } from './layerCache'
 
 export interface UseStyleOptions {
   globalCacheData: Ref<LayerGlobalCacheRecord>
@@ -10,7 +11,7 @@ export interface UseStyleOptions {
   height: Ref<number>
   left: Ref<number>
   top: Ref<number>
-  beforeMaxMinStyles: Ref<CSSProperties>
+  beforeMaxMinStyles?: Ref<CSSProperties>
 }
 
 export function useStyles(
@@ -40,6 +41,7 @@ export function useStyles(
   })
 
   const layerStyles = computed((): CSSProperties => {
+    const maxMinStyles = beforeMaxMinStyles ? unref(beforeMaxMinStyles) : {}
     return {
       zIndex: unref(globalCacheData).zIndex,
       width: `${width.value}px`,
@@ -47,7 +49,7 @@ export function useStyles(
       left: `${left.value}px`,
       top: `${top.value}px`,
       position: props.fixed ? 'fixed' : 'absolute',
-      ...unref(beforeMaxMinStyles)
+      ...maxMinStyles
     }
   })
 

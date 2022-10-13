@@ -1,9 +1,11 @@
 {
   "extends": "tsconfig/vite.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@ui/*": ["./src/*"]
-    }
-  }
+    "allowJs": true,
+    "noEmit": false,
+    "incremental": true,
+    "declaration": true,
+    "outDir": "dist/types"
+  },
+  "exclude": ["vite.config.ts"]
 }

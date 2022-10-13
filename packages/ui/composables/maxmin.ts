@@ -1,8 +1,11 @@
-import { type CSSProperties, nextTick, type Ref, ref, toRefs, unref, watch } from 'vue'
+import type { CSSProperties, Ref } from 'vue'
+import type { LayerProps } from '../components/Layer/props'
+import type { LayerGlobalCacheRecord } from './layerCache'
+
+import { nextTick, ref, toRefs, unref, watch } from 'vue'
 import { promiseTimeout, useWindowScroll, useWindowSize } from '@vueuse/core'
-import { type LayerProps } from '../components/Layer/props'
 import { getDomPosition, getDomWidthAndHeight } from '../utils/dom'
-import { LayerCache, type LayerGlobalCacheRecord } from './layerCache'
+import { LayerCache } from './layerCache'
 
 export interface MaxMinOptions {
   layerMainRefEl: Ref<HTMLElement | null>
@@ -15,6 +18,12 @@ export interface MaxMinOptions {
   left: Ref<number>
   top: Ref<number>
   showShade: Ref<boolean>
+}
+
+export interface MaxMinReturn {
+  beforeMaxMinStyles: Ref<CSSProperties>
+  minimize: () => Promise<void>
+  restoreOrFull: () => Promise<void>
 }
 
 export interface MinSettings {
@@ -70,7 +79,7 @@ export function useMaxMin(
     updateGlobalCache,
     showShade
   }: MaxMinOptions
-) {
+): MaxMinReturn {
   const { maxmin, fixed, visible, minStack } = toRefs(props)
 
   // window

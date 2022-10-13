@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { type CSSProperties } from 'vue'
-import { type LayerProps } from '../../props'
+import type { CSSProperties } from 'vue'
+import type { LayerProps } from '../../props'
 import { toRefs, unref } from 'vue'
 import { computed, ref } from 'vue'
 import { layerProps, shadeProps } from '../../props'

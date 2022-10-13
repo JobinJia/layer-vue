@@ -1,6 +1,6 @@
-import { type LayerProps } from '../components/Layer/props'
-import { type Ref } from 'vue'
-import { type LayerGlobalCacheRecord } from './layerCache'
+import type { LayerProps } from '../components/Layer/props'
+import type { Ref } from 'vue'
+import type { LayerGlobalCacheRecord } from './layerCache'
 import { ref, toRefs, unref, watch } from 'vue'
 import { until, useElementSize, useWindowSize } from '@vueuse/core'
 
@@ -27,13 +27,18 @@ export function useArea(props: LayerProps, { layerMainRefEl, globalCacheData }: 
     const areaVal = unref(area)
     const maxWidthVal = unref(maxWidth)
 
-    if (areaVal[0] === '' && maxWidthVal > 0) {
+    let innerArea = [-1, -1]
+    if (typeof areaVal === 'string' || typeof areaVal === 'number') {
+      innerArea = areaVal === 'auto' ? [-1, -1] : [areaVal, -1]
+    }
+
+    if (innerArea[0] === -1 && maxWidthVal > 0) {
       unref(mainWidth) > maxWidthVal && (width.value = maxWidthVal)
     }
-    if (areaVal[1] === '') {
-      if (maxHeight.value > 0 && areaVal[1] > maxHeight.value) {
-        height.value = maxHeight.value
-      } else if (props.fixed && areaVal[1] >= winHeight.value) {
+    if (innerArea[1] === -1) {
+      if (props.maxHeight && props.maxHeight > 0 && innerArea[1] > props.maxHeight) {
+        height.value = props.maxHeight
+      } else if (props.fixed && innerArea[1] >= winHeight.value) {
         height.value = winHeight.value
       }
     }
@@ -43,7 +48,7 @@ export function useArea(props: LayerProps, { layerMainRefEl, globalCacheData }: 
   }
 
   watch(
-    () => [visible.value, area.value],
+    () => [props.visible, props.area],
     async ([visibleVal]) => {
       if (visibleVal) {
         await calcArea()

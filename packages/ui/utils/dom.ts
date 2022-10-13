@@ -1,5 +1,5 @@
 import { makeDestructurable } from '@vueuse/core'
-import { CSSProperties } from 'vue'
+import type { CSSProperties } from 'vue'
 
 export function getDomWidthAndHeight(domEl: HTMLElement) {
   const [domWidth, domHeight] = [domEl.offsetWidth, domEl.offsetHeight]
@@ -15,6 +15,7 @@ export function getDomPosition(domEl: HTMLElement) {
 }
 
 export function getStyle(node: HTMLElement, name: keyof CSSProperties) {
-  const style = window.getComputedStyle(node, null)
-  return style[style.getPropertyValue ? 'getPropertyValue' : 'getAttribute'](name)
+  const style: CSSStyleDeclaration = window.getComputedStyle(node, null)
+  // const val = style[style.getPropertyValue ? 'getPropertyValue' : 'getAttribute'](name)
+  return style.getPropertyValue(name)
 }

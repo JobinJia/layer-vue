@@ -15,7 +15,9 @@ export interface ContentStylesOptions {
 export function useContentStyle(
   props: LayerProps,
   { layerMainRefEl, layerTitleRefEl, layerBtnRefEl, layerContentRefEl, height }: ContentStylesOptions
-) {
+): {
+  contentStyle: Ref<CSSProperties>
+}{
   const { visible } = toRefs(props)
 
   const contentStyle = ref<CSSProperties>({})

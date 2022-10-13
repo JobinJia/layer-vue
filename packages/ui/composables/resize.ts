@@ -1,7 +1,9 @@
-import { computed, type Ref, toRefs, unref } from 'vue'
+import type { Ref } from 'vue'
+import type { LayerProps } from '../components/Layer/props'
+
+import { computed, toRefs, unref } from 'vue'
 import { useDraggable } from '@vueuse/core'
 import { getDomWidthAndHeight } from '../utils/dom'
-import { type LayerProps } from '../components/Layer/props'
 
 export interface ResizeOptions {
   layerResizeRefEl: Ref<HTMLElement | null>

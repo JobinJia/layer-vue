@@ -1,6 +1,7 @@
-import { computed, type Ref, toRefs, unref } from 'vue'
-import { useDraggable, useWindowScroll, useWindowSize } from '@vueuse/core'
+import type { Ref } from 'vue'
 import { type LayerProps } from '../components/Layer/props'
+import { computed, toRefs, unref } from 'vue'
+import { useDraggable, useWindowScroll, useWindowSize } from '@vueuse/core'
 import { getDomWidthAndHeight, getStyle } from '../utils/dom'
 
 export interface DragOptions {
