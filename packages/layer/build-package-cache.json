@@ -1,0 +1,6 @@
+{
+  "main": "./dist/layer-vue.es.js",
+  "types": "./dist/types/index.d.ts",
+  "unpkg": "./dist/layer-vue.umd.js",
+  "jsdelivr": "./dist/layer-vue.umd.js"
+}

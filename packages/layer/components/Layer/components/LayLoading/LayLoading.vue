@@ -2,21 +2,25 @@
 import { layerProps } from '../../props'
 import { useGlobalCache } from '../../../../composables/globalCache'
 import { useArea } from '../../../../composables/area'
-import {computed, ref, toRefs, useSlots} from 'vue'
+import { computed, ref, toRefs, useSlots } from 'vue'
 import { useShade } from '../../../../composables/shade'
 import { useOffset } from '../../../../composables/offset'
 import { useLayerTransition } from '../../../../composables/transition'
 import { useStyles } from '../../../../composables/styles'
+import { useAutoCloseByVisible } from '../../../../composables/autoClose'
 
 const props = defineProps(layerProps)
 const slots = useSlots()
+const emit = defineEmits<{
+  (e: 'update:visible', visible: boolean): void
+}>()
 
 const { visible, type } = toRefs(props)
 
 const layerMainRefEl = ref<HTMLElement | null>(null)
 
 // 全局缓存
-const { globalCacheIns, globalCacheData, updateGlobalCache, moveToTop } = useGlobalCache(props)
+const { globalCacheData } = useGlobalCache(props)
 
 const { width, height } = useArea(props, { layerMainRefEl, globalCacheData })
 
@@ -29,6 +33,9 @@ const { left, top } = useOffset(props, {
 
 // transition
 const { layerTransition } = useLayerTransition(props)
+
+// auto close
+useAutoCloseByVisible(props, emit)
 
 // styles
 const { layerStyles, layerClasses } = useStyles(props, {
@@ -48,7 +55,6 @@ const contentStyles = computed(() => {
     }
   ]
 })
-
 </script>
 
 <template>

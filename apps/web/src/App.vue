@@ -1,8 +1,8 @@
 <script setup lang="ts">
 // import { RouterLink, RouterView } from 'vue-router'
 // import HelloWorld from './components/HelloWorld.vue'
-import { TButton, VLayer } from 'ui';
-import { ref } from 'vue';
+import { TButton, VLayer } from 'layer'
+import { ref } from 'vue'
 const visible = ref(false)
 const visible2 = ref(false)
 const visible3 = ref<boolean>(false)
@@ -11,6 +11,12 @@ const message = ref(false)
 const messageIcon = ref(false)
 const tooltip = ref<boolean>(false)
 const tooltipAutoClose = ref(false)
+const loading = ref(false)
+const loadingType = ref<0 | 1 | 2>(0)
+function openLoading(type: 0 | 1 | 2) {
+  loadingType.value =  type
+  loading.value = true
+}
 </script>
 
 <template>
@@ -76,8 +82,12 @@ const tooltipAutoClose = ref(false)
     <VLayer v-model:visible="tooltip" tips="b" type="tips" content="BBBB">
       <TButton>Default(B)</TButton>
     </VLayer>
-    <!--    <VLayer :visible="true" type="loading" :loadingType="2" :shade="false"></VLayer>-->
   </div>
+  <br />
+  <TButton @click="openLoading(0)">Loading Type 0</TButton>
+  <TButton @click="openLoading(1)">Loading Type 1</TButton>
+  <TButton @click="openLoading(2)">Loading Type 2</TButton>
+  <VLayer v-model:visible="loading" type="loading" :loadingType="loadingType" :time="1000"></VLayer>
 </template>
 
 <style scoped>

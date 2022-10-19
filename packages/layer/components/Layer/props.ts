@@ -260,7 +260,7 @@ export const layerProps = {
     default: -1
   },
   loadingType: {
-    type: Number as PropType<LayerLoadingType>,
+    type: Number as unknown as PropType<LayerLoadingType>,
     default: 0
   }
 }

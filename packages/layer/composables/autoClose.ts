@@ -33,6 +33,7 @@ export function useAutoCloseByVisible(
   }
 ) {
   const { time, visible } = toRefs(props)
+
   function handleAutoClose() {
     emit('update:visible', false)
   }

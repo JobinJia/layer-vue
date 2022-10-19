@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "tsconfig": "workspace:*",
-    "ui": "workspace:*",
+    "layer": "workspace:*",
     "@vue/tsconfig": "^0.1.3"
   }
 }

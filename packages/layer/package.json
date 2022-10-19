@@ -1,8 +1,6 @@
 {
-  "name": "ui",
+  "name": "layer",
   "version": "0.0.0",
-  "main": "./dist/layer-vue.mjs",
-  "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "scripts": {
     "lint": "eslint *.ts*",
