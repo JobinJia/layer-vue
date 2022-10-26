@@ -23,11 +23,11 @@ const { globalCacheData } = useGlobalCache(props)
 const { visible, type } = toRefs(props)
 
 // type控制是否展示 Shade层
-const { shadeStyles, showShade } = useShade(props, { globalCacheData })
+const { shadeStyles, showShade, handleClickShade } = useShade(props, { globalCacheData, emit })
 // transition
 const { layerTransition } = useLayerTransition(props)
 // shade props
-const { pickProps } = usePickProps<LayerProps, typeof shadeProps>(props, shadeProps)
+// const { pickProps } = usePickProps<LayerProps, typeof shadeProps>(props, shadeProps)
 
 const layerMainRefEl = ref<HTMLElement | null>(null)
 const { left, top } = useOffset(props, { layerMainRefEl, globalCacheData })
@@ -54,7 +54,7 @@ const { showIcon, iconClasses } = useIcon(props)
 </script>
 <template>
   <teleport to="body">
-    <div v-if="showShade" class="layui-layer-shade" :style="shadeStyles"></div>
+    <div v-if="showShade" class="layui-layer-shade" :style="shadeStyles"  @click.stop.prevent="handleClickShade"></div>
     <transition :enter-active-class="layerTransition.in" :leave-active-class="layerTransition.out">
       <div v-if="visible" ref="layerMainRefEl" :class="tipsClasses" :style="basicStyle">
         <div class="layui-layer-content" :class="{ 'layui-layer-padding': props.icon !== -1 }">

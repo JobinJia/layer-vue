@@ -19,6 +19,14 @@ export function useComponentProps(props: LayerProps) {
           maxWidth: 260
         }
         break
+      case 'drawer':
+        cacheProps = {
+          resize: false,
+          fixed: false,
+          shadeClose: true,
+          move: false
+        }
+        break
       default:
         break
     }

@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import type { LayerGlobalCacheRecord } from './layerCache'
 import { ref, toRefs, unref, watch } from 'vue'
 import { until, useElementSize, useWindowSize } from '@vueuse/core'
+import {isArray} from "lodash";
 
 export interface AreaOption {
   layerMainRefEl: Ref<HTMLElement | null>
@@ -10,12 +11,12 @@ export interface AreaOption {
 }
 
 export function useArea(props: LayerProps, { layerMainRefEl, globalCacheData }: AreaOption) {
-  const { area, visible, maxWidth, maxHeight } = toRefs(props)
+  const { area, maxWidth, type, offset } = toRefs(props)
 
   const width = ref<number>(-1)
   const height = ref<number>(-1)
 
-  const { height: winHeight } = useWindowSize({ listenOrientation: true })
+  const { height: winHeight, width: winWidth } = useWindowSize({ listenOrientation: true })
   const { width: mainWidth } = useElementSize(layerMainRefEl)
 
   async function calcArea() {
@@ -28,11 +29,34 @@ export function useArea(props: LayerProps, { layerMainRefEl, globalCacheData }: 
     const maxWidthVal = unref(maxWidth)
 
     let innerArea = [-1, -1]
-    if (typeof areaVal === 'string' || typeof areaVal === 'number') {
-      innerArea = areaVal === 'auto' ? [-1, -1] : [areaVal, -1]
+
+    if (isArray(areaVal)) {
+      innerArea[0] = areaVal[0] === '' ? -1 : areaVal[0]
+      innerArea[1] = areaVal[1]
     }
 
-    if (innerArea[0] === -1 && maxWidthVal > 0) {
+    // offset val
+    const offsetVal = unref(offset)
+
+    if (unref(type)) {
+      switch (unref(type)) {
+        case 'drawer':
+          if (offsetVal === 'lt' || offsetVal === 'rt') {
+            innerArea = [innerArea[0], unref(winHeight)]
+          }
+          if (offsetVal === 't') {
+            innerArea = [unref(winWidth), innerArea[1]]
+          }
+          if (offsetVal === 'b') {
+            innerArea = [unref(winWidth), innerArea[1]]
+          }
+          break
+        default:
+          break
+      }
+    }
+
+    if (innerArea[0] === -1 && maxWidthVal > 0 && areaVal === 'auto') {
       unref(mainWidth) > maxWidthVal && (width.value = maxWidthVal)
     }
     if (innerArea[1] === -1) {
@@ -43,12 +67,12 @@ export function useArea(props: LayerProps, { layerMainRefEl, globalCacheData }: 
       }
     }
 
-    width.value = areaVal[0]
-    height.value = areaVal[1]
+    width.value = innerArea[0]
+    height.value = innerArea[1]
   }
 
   watch(
-    () => [props.visible, props.area],
+    () => [props.visible, props.area, winWidth.value, winHeight.value],
     async ([visibleVal]) => {
       if (visibleVal) {
         await calcArea()

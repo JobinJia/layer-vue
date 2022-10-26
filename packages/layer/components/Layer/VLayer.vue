@@ -5,7 +5,7 @@ import { watch, useSlots } from 'vue'
 import VLayerTips from './components/LayToolTip/LayToolTip.vue'
 import VLayModal from './components/LayModal/LayModal.vue'
 import VLayMessage from './components/LayMessage/LayMessage.vue'
-import VLoading from './components/LayLoading/LayLoading.vue'
+import LayLoading from './components/LayLoading/LayLoading.vue'
 import { layerProps } from './props'
 import { computed, shallowRef, toRefs, useAttrs } from 'vue'
 import { useComponentProps } from '../../composables/componentProps'
@@ -28,7 +28,7 @@ watch(
         comp.value = VLayMessage
         break
       case 'loading':
-        comp.value = VLoading
+        comp.value = LayLoading
         break
       default:
         comp.value = VLayModal

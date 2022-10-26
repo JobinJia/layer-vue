@@ -41,7 +41,7 @@ const { contentStyle } = useContentStyle(props, {
 
 const { visible, type } = toRefs(props)
 
-const { shadeStyles, showShade } = useShade(props, { globalCacheData })
+const { shadeStyles, showShade, handleClickShade } = useShade(props, { globalCacheData, emit })
 
 const { left, top } = useOffset(props, {
   layerMainRefEl,
@@ -92,7 +92,7 @@ const {
 
 <template>
   <teleport to="body">
-    <div v-if="showShade" class="layui-layer-shade" :style="shadeStyles"></div>
+    <div v-if="showShade" class="layui-layer-shade" :style="shadeStyles"  @click.stop.prevent="handleClickShade"></div>
     <transition :enter-active-class="layerTransition.in" :leave-active-class="layerTransition.out">
       <div v-if="visible" ref="layerMainRefEl" :style="layerStyles" :class="layerClasses">
         <div

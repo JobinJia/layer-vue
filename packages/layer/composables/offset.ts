@@ -2,8 +2,8 @@ import type { Ref } from 'vue'
 import type { LayerGlobalCacheRecord } from './layerCache'
 import type { LayerProps } from '../components/Layer/props'
 
-import { ref, toRefs, unref, watch } from 'vue'
-import { until, useWindowSize } from '@vueuse/core'
+import {nextTick, ref, toRefs, unref, watch} from 'vue'
+import {until, useElementSize, useWindowSize} from '@vueuse/core'
 import { isNumber } from 'lodash'
 import { getDomWidthAndHeight } from '../utils/dom'
 
@@ -24,6 +24,9 @@ export function useOffset(props: LayerProps, { layerMainRefEl, globalCacheData }
     listenOrientation: true,
     includeScrollbar: false
   })
+
+  // element width
+  const { width, height } = useElementSize(layerMainRefEl)
 
   async function calcOffset() {
     await until(layerMainRefEl).not.toBeNull()
@@ -78,7 +81,7 @@ export function useOffset(props: LayerProps, { layerMainRefEl, globalCacheData }
   }
 
   watch(
-    () => [visible.value, windowWidth.value, windowHeight.value],
+    () => [visible.value, windowWidth.value, windowHeight.value, width.value, height.value],
     async ([visibleVal]) => {
       if (visibleVal) {
         const globalCache = unref(globalCacheData)

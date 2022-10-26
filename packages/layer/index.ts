@@ -11,7 +11,6 @@ const components = {
 export default {
   install: (app: App) => {
     Object.keys(components).forEach((component) => {
-      console.log(component)
       app.component(component, components[component])
     })
   }

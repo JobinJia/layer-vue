@@ -5,15 +5,19 @@ import { ref, toRefs, unref, watch } from 'vue'
 
 export interface ShadeOption {
   globalCacheData: Ref<LayerGlobalCacheRecord>
+  emit: {
+    (event: 'update:visible', visible: boolean): void
+  }
 }
 
 export interface ShadeReturn {
   showShade: Ref<boolean>
-  shadeStyles: Ref<CSSProperties>
+  shadeStyles: Ref<CSSProperties>,
+  handleClickShade: () => void
 }
 
-export function useShade(props: LayerProps, { globalCacheData }: ShadeOption): ShadeReturn {
-  const { shade, type, visible } = toRefs(props)
+export function useShade(props: LayerProps, { globalCacheData, emit }: ShadeOption): ShadeReturn {
+  const { shade, type, visible, shadeClose } = toRefs(props)
 
   const showShade = ref<boolean>(true)
   const shadeStyles = ref<CSSProperties>({})
@@ -25,7 +29,7 @@ export function useShade(props: LayerProps, { globalCacheData }: ShadeOption): S
       s: shade.value
     }),
     ({ v, t, s }) => {
-      showShade.value = v && ['dialog', 'page', 'loading'].includes(t) && s !== false
+      showShade.value = v && ['dialog', 'page', 'loading', 'drawer'].includes(t) && s !== false
     },
     { immediate: true }
   )
@@ -46,8 +50,15 @@ export function useShade(props: LayerProps, { globalCacheData }: ShadeOption): S
     { immediate: true }
   )
 
+  function handleClickShade() {
+    if (unref(shadeClose)) {
+      emit('update:visible', false)
+    }
+  }
+
   return {
     showShade,
-    shadeStyles
+    shadeStyles,
+    handleClickShade
   }
 }

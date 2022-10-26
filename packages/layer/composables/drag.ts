@@ -12,7 +12,7 @@ export interface DragOptions {
 }
 
 export function useDrag(props: LayerProps, { moveElRef, left, top, layerMainRefEl }: DragOptions) {
-  const { moveOut, fixed } = toRefs(props)
+  const { moveOut, fixed, move } = toRefs(props)
 
   const initialValue = computed(() => {
     return {
@@ -34,11 +34,13 @@ export function useDrag(props: LayerProps, { moveElRef, left, top, layerMainRefE
     preventDefault: true,
     stopPropagation: true,
     onStart(_, e) {
+      if (!unref(move)) return
       const leftVal = getStyle(layerMainRefEl.value, 'left')
       const topVal = getStyle(layerMainRefEl.value, 'top')
       state.offset = [e.clientX - parseFloat(leftVal), e.clientY - parseFloat(topVal)]
     },
     onMove(_, e) {
+      if (!unref(move)) return
       let X = e.clientX - state.offset[0]
       let Y = e.clientY - state.offset[1]
 

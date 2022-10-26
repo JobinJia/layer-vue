@@ -17,6 +17,10 @@ function openLoading(type: 0 | 1 | 2) {
   loadingType.value =  type
   loading.value = true
 }
+const drawer1 = ref(false)
+const drawer2 = ref(false)
+const drawer3 = ref(false)
+const drawer4 = ref(false)
 </script>
 
 <template>
@@ -88,6 +92,23 @@ function openLoading(type: 0 | 1 | 2) {
   <TButton @click="openLoading(1)">Loading Type 1</TButton>
   <TButton @click="openLoading(2)">Loading Type 2</TButton>
   <VLayer v-model:visible="loading" type="loading" :loadingType="loadingType" :time="1000"></VLayer>
+  <br />
+  <TButton @click="drawer1 = !drawer1">Drawer Left</TButton>
+  <TButton @click="drawer2 = !drawer2">Drawer Right</TButton>
+  <TButton @click="drawer3 = !drawer3">Drawer Top</TButton>
+  <TButton @click="drawer4 = !drawer4">Drawer Bottom</TButton>
+  <VLayer v-model:visible="drawer1" type="drawer" offset="lt" :area="[400]" :anim="7">
+    <div>Left</div>
+  </VLayer>
+  <VLayer v-model:visible="drawer2" type="drawer" offset="rt" :area="[400]" :anim="8">
+    <div>Right</div>
+  </VLayer>
+  <VLayer v-model:visible="drawer3" type="drawer" offset="t" :area="['', 320]" :anim="9">
+    <div>Top</div>
+  </VLayer>
+  <VLayer v-model:visible="drawer4" type="drawer" offset="b" :area="['', 230]" :anim="2">
+    <div>Bottom</div>
+  </VLayer>
 </template>
 
 <style scoped>

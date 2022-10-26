@@ -3,7 +3,7 @@ import type { ExtractPropTypes, PropType } from 'vue'
 // type中移除page 如果要使用 可以 在default slot中 div v-html="xxx
 // 原来的1 = page 现更正为message
 // export type LayerType = 0 | 1 | 2 | 3 | 4 // | 'dialog(modal)' | 'message' | 'iframe' | 'loading' | 'tips';
-export type LayerType = 'dialog' | 'page' | 'iframe' | 'loading' | 'tips' | 'message'
+export type LayerType = 'dialog' | 'page' | 'iframe' | 'loading' | 'tips' | 'message' | 'drawer'
 export type LayerTransitionType = 0 | 1 | 2 | 3 | 4 | 5 | 6
 export type LayerLoadingType = 0 | 1 | 2
 
@@ -63,7 +63,7 @@ export const layerProps = {
    * 在默认状态下，layer是宽高都自适应的，但当你只想定义宽度时，你可以area: '500px'，高度仍然是自适应的。当你宽高都要定义时，你可以area: ['500px', '300px']
    */
   area: {
-    type: [Number, Array, String] as PropType<Area>,
+    type: [Number, Array, String] as unknown as PropType<Area>,
     default: 'auto'
   },
   /**
